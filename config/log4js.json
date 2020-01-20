@@ -1,4 +1,5 @@
 {
+  "disableClustering": true,
     "appenders": {
       "console": { "type": "console" },
       "access": {

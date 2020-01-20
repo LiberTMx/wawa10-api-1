@@ -1,0 +1,37 @@
+{
+    "extends": "../tslint.json",
+    "rules": {
+        "curly": [true, "ignore-same-line"],
+        
+        "directive-selector": [
+            true,
+            "attribute",
+            "app",
+            "camelCase"
+        ],
+        "comment-format": [false, "check-space", "check-uppercase", "allow-trailing-lowercase"],
+        "component-selector": [
+            true,
+            "element",
+            "app",
+            "kebab-case"
+        ],
+
+        "max-line-length": [
+            true,
+            240
+          ],
+
+        "one-line": [
+            false,
+            "check-open-brace",
+            "check-catch",
+            "check-else",
+            "check-whitespace"
+          ],
+
+        "no-trailing-whitespace": false,
+        "whitespace": [false, "check-branch", "check-operator", "check-typecast"]
+
+    }
+}
