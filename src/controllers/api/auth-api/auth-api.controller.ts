@@ -18,7 +18,7 @@ export class AuthApiController
     const body = req.body;
 
     if (!body) throw new HttpException('Body is missing', HttpStatus.BAD_REQUEST);
-    if (!body.username || !body.password) throw new HttpException('Missing email or password', HttpStatus.BAD_REQUEST);
+    if (!body.username || !body.password) throw new HttpException('Missing username or password', HttpStatus.BAD_REQUEST);
 
     return await this.authService.login(body);
   }
