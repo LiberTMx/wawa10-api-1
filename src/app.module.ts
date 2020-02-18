@@ -2,14 +2,16 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { AuthApiController } from './controllers/api/auth-api/auth-api.controller';
-import { AuthService } from './modules/auth/services/auth/auth.service';
+import { ApiModule } from './controllers/api/api.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    AuthModule,
+    ApiModule,
   ],
-  controllers: [AppController, AuthApiController],
-  providers: [AppService, AuthService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
