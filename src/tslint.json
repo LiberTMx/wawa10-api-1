@@ -16,6 +16,8 @@
             "app",
             "kebab-case"
         ],
+        
+        "max-classes-per-file": false,
 
         "max-line-length": [
             true,

@@ -34,6 +34,7 @@
     "compression": "^1.7.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
     "helmet": "^3.21.2",
     "jsonwebtoken": "^8.5.1",
     "log4js": "^6.1.0",
@@ -43,6 +44,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",
+    "soap": "^0.31.0",
     "typeorm": "^0.2.22",
     "typeorm-transactional-cls-hooked": "^0.1.12",
     "winston": "^3.2.1"
