@@ -3,17 +3,21 @@ import { UserRepositoryService } from './user/services/user-repository/user-repo
 import { userProvider } from './user/user.providers';
 import { ConfigurationModule } from '../configuration/configuration.module';
 import { DatabaseModule } from '../database/database.module';
+import { credentialProvider } from './credential/credential.providers';
+import { CredentialRepositoryService } from './credential/services/credential-repository.service';
 
 @Module({
   imports: [
     DatabaseModule,
   ],
   exports: [
+    CredentialRepositoryService,
     UserRepositoryService,
+
   ],
   providers: [
-    UserRepositoryService,
-    ...userProvider,
+    CredentialRepositoryService, ...credentialProvider,
+    UserRepositoryService, ...userProvider,
   ],
 })
 export class RepositoryModule {}

@@ -75,4 +75,15 @@ export class AuthApiController
     return newUser;
   }
 
+  @Post('changePassword')
+  async changePassword(@Request() req): Promise<any> 
+  {
+    const body = req.body;
+
+    if (!body) throw new HttpException('Body is missing', HttpStatus.BAD_REQUEST);
+    if (!body.username || !body.password || !body.jeton) throw new HttpException('Missing username, password or jeton', HttpStatus.BAD_REQUEST);
+
+    return await this.authService.changePassword(body);
+  }
+
 }

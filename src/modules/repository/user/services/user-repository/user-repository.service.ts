@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { AuthUserEntity } from '../../entities/auth-user.entity';
+import { BaseRepository } from 'typeorm-transactional-cls-hooked';
 
 import * as log4js from 'log4js';
 import { Repository } from 'typeorm';
@@ -9,8 +10,8 @@ const logger = log4js.getLogger('UserRepositoryService');
 export class UserRepositoryService 
 {
     constructor(
-        @Inject('UserRepositoryToken')
-        private readonly userRepository: Repository<AuthUserEntity>,
+        @Inject('AuthUserRepositoryToken')
+        private readonly userRepository: BaseRepository<AuthUserEntity>,
     ) {}
     
     async findByUserName(username: string): Promise<AuthUserEntity> {
@@ -26,8 +27,15 @@ export class UserRepositoryService
        //return null;
 
         logger.debug('UserRepositoryService::findByUserName - username:'+username);
-        const user=this.userRepository.findOne( { /*username:*/ username});
-        logger.debug('found user?', user);
+        /*
+        const user=this.userRepository.findOne( {
+            where: { delete_at: IsNotNull(), username },
+        });*/
+
+        const user=this.userRepository.createQueryBuilder('authUser')
+            .where('authUser.username = :username', {username})
+            .andWhere('authUser.deleted_at is null')
+            .getOne();
         return user;
     }
 
@@ -44,8 +52,8 @@ export class UserRepositoryService
        return null;
     }
 
-    async saveUser(user: AuthUserEntity): Promise<AuthUserEntity> {
-        // return this.authUserRepository.save(user);
-        return null;
+    async saveUser(user: AuthUserEntity): Promise<AuthUserEntity> 
+    {
+        return this.userRepository.save(user);
     }
 }

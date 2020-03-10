@@ -26,6 +26,18 @@ export class AuthUserEntity {
     @Column({name: 'must_change_password'})
     mustChangePassword: boolean;
 
+    @Column({name: 'init_credential'})
+    initCredential: boolean;
+
+    @Column({name: 'deleted_at'})
+    deletedAt: Date;
+
+    @Column({name: 'last_login_at'})
+    lastLoginAt: Date;
+
+    @Column({name:'change_password_jeton'})
+    changePasswordJeton: string;
+
     //@Column({name: 'enabled'})
     //enabled: boolean;
 

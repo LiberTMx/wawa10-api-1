@@ -26,7 +26,18 @@ CREATE  TABLE auth_user
   notify_parents tinyint(1) DEFAULT '0',
   password varchar(255),
   must_change_password tinyint(1),
+  init_credential tinyint(1),
+  last_login_at datetime DEFAULT NULL,
   PRIMARY KEY  (id) 
 )
 ENGINE=InnoDB DEFAULT CHARSET=latin1
 ;
+/*
+CREATE TABLE `membres` (
+  `club_role` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `groupe` int(11) DEFAULT NULL,
+  `groupe_entr` int(11) DEFAULT NULL,
+  `comment` text,
+*/

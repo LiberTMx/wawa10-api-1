@@ -100,7 +100,7 @@ export class SoapService
                     client.GetClubTeams(args, (err1, result) => {
                         //logger.error('err?', err);
                         //logger.info(JSON.stringify(result) );
-                        if(err)
+                        if(err1)
                         {
                             logger.warn('Error calling client.GetClubTeams', err1);
                             resolve({data:null, err: err1});

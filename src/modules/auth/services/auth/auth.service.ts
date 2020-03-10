@@ -1,13 +1,19 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { AuthenticatedUserModel } from '../../model/authenticated-user.model';
+import { BaseRepository, Transactional } from 'typeorm-transactional-cls-hooked';
 
 import * as crypto from 'crypto';
 import * as log4js from 'log4js';
+import * as guid from 'guid';
+
 import { TokensModel } from '../../model/tokens.model';
 import { JwtService, JWT_CONFIG } from '../jwt/jwt.service';
 import { UserRepositoryService } from '../../../repository/user/services/user-repository/user-repository.service';
 import { CreateUserDTO } from '../../../../shared/dto/create-user.dto';
 import { AuthUserEntity } from '../../../repository/user/entities/auth-user.entity';
+import { CredentialRepositoryService } from '../../../repository/credential/services/credential-repository.service';
+import { CredentialEntity } from '../../../repository/credential/entities/credential.entity';
+import { MailService } from '../../../mail/services/mail/mail.service';
 
 const logger = log4js.getLogger('AuthService');
 
@@ -17,9 +23,12 @@ export class AuthService
 
     constructor(
         private readonly jwtService: JwtService,
+        private readonly mailService: MailService,
         private readonly userRepositoryService: UserRepositoryService,
+        private readonly credentialRepositoryService: CredentialRepositoryService,
     ) {}
 
+    @Transactional()
     async login(credentials: { username: string; password: string }): Promise<AuthenticatedUserModel>
     {
         /*
@@ -31,7 +40,7 @@ export class AuthService
 
         */
 
-       const currentUser = await this.userRepositoryService.findByUserName(credentials.username);
+       let currentUser = await this.userRepositoryService.findByUserName(credentials.username);
        if (!currentUser) {
         const secretKey = JWT_CONFIG.jwtSecret;
         const hash = crypto.createHmac('sha256', secretKey).update(credentials.password).digest('hex');
@@ -40,6 +49,26 @@ export class AuthService
         logger.debug('login password hash:', hash);
         throw new BadRequestException('The specified user does not exists');
        }
+       else
+       {
+        logger.debug('Found user:', currentUser);
+       }
+
+       if(currentUser.initCredential === true)
+       {
+          logger.debug('initializing credentials for user:', currentUser.username);
+          const credential: CredentialEntity=await this.createOrUpdateUserCredential(currentUser, credentials);
+          logger.debug('credential:', credential);
+          if(credential!=null)
+          {
+            const updatedUser: AuthUserEntity = await this.updateUserWithCryptedPassword(currentUser);
+            if(updatedUser === null || updatedUser === undefined)
+            {
+              throw new BadRequestException('The username/password combination is invalid (crypto)');
+            }
+            currentUser = updatedUser;
+          }
+       }
    
        const isValid = await this.checkUserPassword(currentUser, credentials.password);
        if (!isValid) {
@@ -47,6 +76,21 @@ export class AuthService
          throw new BadRequestException('The username/password combination is invalid');
        }
    
+       currentUser.lastLoginAt=new Date();
+       if(currentUser.mustChangePassword===true)
+       {
+         currentUser.changePasswordJeton=this.buildChangePasswordJeton();
+         try
+         {
+           const mailMessage=this.buildMailMessageForChangePasswordJeton(currentUser);
+           this.mailService.sendMailToUser(currentUser, mailMessage);
+         }
+         catch(e)
+         {
+           // nothing
+         }
+       }
+       currentUser=await this.userRepositoryService.saveUser(currentUser);
        const tokens = await this.jwtService.generateToken(currentUser);
    
        const authUser: AuthenticatedUserModel = currentUser as any as  AuthenticatedUserModel;
@@ -55,6 +99,52 @@ export class AuthService
        authUser.tokens = authUserTokens;
        logger.debug('User found:', authUser);
        return authUser;
+    }
+
+    private buildChangePasswordJeton(): string
+    {
+      return guid.raw();
+    }
+
+    private buildMailMessageForChangePasswordJeton(currentUser: AuthUserEntity): string
+    {
+      const message=
+          '<h1>Modification de votre mot de passe</h1>' 
+        + '<p>Dans le formulaire de changement de votre mot de passe, </p>'
+        + '<p>il vous est demandé d\'indiquer un "jeton".</p>'
+        + '<p>Votre jeton est:</p>'
+        + '<p>'+currentUser.changePasswordJeton+'</p>'
+        + '<br>'
+      ;
+      return message;
+    }
+
+    private async updateUserWithCryptedPassword(user: AuthUserEntity): Promise<AuthUserEntity>
+    {
+      const secretKey = JWT_CONFIG.jwtSecret;
+      const passwordHash=crypto.createHmac('sha256', secretKey).update(user.password).digest('hex');
+      logger.debug('saving password hash', user.password, passwordHash);
+      user.password=passwordHash;
+      user.initCredential=false;
+      return await this.userRepositoryService.saveUser(user);
+    }
+
+    private async createOrUpdateUserCredential(currentUser: AuthUserEntity, credentials: { username: string; password: string })
+    : Promise<CredentialEntity>
+    {
+      const credential=await this.credentialRepositoryService.findByUserName(credentials.username);
+      logger.debug('credential for '+credentials.username, credential);
+      if(credential===null || credential===undefined)
+      {
+
+        if(currentUser.password === credentials.password)
+        {
+          // ok on peut créer le credential
+          return await this.credentialRepositoryService.createCredential(credentials.username, credentials.password);
+        }
+      }
+      credential.credential=credentials.password;
+      return await this.credentialRepositoryService.save(credential);
     }
 
     private async checkUserPassword(signedUser: AuthUserEntity, password: string ): Promise<boolean> 
@@ -112,4 +202,38 @@ export class AuthService
         // return this.authUserRepository.findOne( { where: { username: userName} } );
         return null;
     }
+
+    @Transactional()
+    async changePassword(data: { username: string; password: string; jeton: string }): Promise<AuthenticatedUserModel>
+    {
+      const currentUser = await this.userRepositoryService.findByUserName(data.username);
+      if(currentUser!==null && currentUser!==undefined)
+      {
+        if(currentUser.changePasswordJeton === data.jeton)
+        {
+          this.createOrUpdateUserCredential(currentUser/*: AuthUserEntity*/, 
+                          /*credentials:*/ { username: data.username, password: data.password });
+          const secretKey = JWT_CONFIG.jwtSecret;
+          const hash = crypto.createHmac('sha256', secretKey).update(data.password).digest('hex');
+          currentUser.password=hash;
+          currentUser.mustChangePassword=false;
+          this.userRepositoryService.saveUser(currentUser);
+          const tokens = await this.jwtService.generateToken(currentUser);
+   
+          const authUser: AuthenticatedUserModel = currentUser as any as  AuthenticatedUserModel;
+          const authUserTokens: TokensModel = new TokensModel();
+          Object.assign(authUserTokens, tokens);
+          authUser.tokens = authUserTokens;
+          logger.debug('User found - password changed:', authUser);
+          return authUser;
+        }
+        else
+        {
+          throw new BadRequestException('Invalid jeton', '1001');
+        }
+
+      }
+      throw new BadRequestException('Still not implemented!', '9999');
+    }
+
 }
