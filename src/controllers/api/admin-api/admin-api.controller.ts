@@ -14,4 +14,5 @@ export class AdminApiController
     {
       return await this.soapService.getTeamList();
     }
+    
 }
