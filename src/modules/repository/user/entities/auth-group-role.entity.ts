@@ -18,9 +18,11 @@ export class AuthGroupRoleEntity {
     @JoinColumn({name: 'auth_group_id'})
     authGroup: AuthGroupEntity;
 
+    /*
     @ManyToOne(type => AuthRoleEntity, authRoleEntity => authRoleEntity.authGroupRole)
     @JoinColumn({name: 'auth_role_id'})
     authRole: AuthRoleEntity;
+    */
 
     @OneToOne(type => AuthRoleEntity)
     @JoinColumn({name: 'auth_role_id'})

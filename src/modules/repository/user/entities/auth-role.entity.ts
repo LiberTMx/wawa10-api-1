@@ -1,5 +1,5 @@
-import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
-import { AuthGroupRoleEntity } from './auth-group-role.entity';
+import { Entity, PrimaryColumn, Column, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import { AuthDomainEntity } from './auth-domain.entity';
 
 @Entity({name: 'auth_role'})
 export class AuthRoleEntity {
@@ -8,9 +8,9 @@ export class AuthRoleEntity {
     id: number;
 
     @Column()
-    name: string;
+    role: string;
 
-    @OneToMany(type => AuthGroupRoleEntity, authGroupRoleEntity => authGroupRoleEntity.authRole)
-    authGroupRole: AuthGroupRoleEntity[];
-
+    @OneToOne(type => AuthDomainEntity)
+    @JoinColumn({name: 'domain_id'})
+    authDomain: AuthDomainEntity;
 }

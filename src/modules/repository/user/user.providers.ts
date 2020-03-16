@@ -1,5 +1,7 @@
 import { Connection, Repository } from 'typeorm';
 import { AuthUserEntity } from './entities/auth-user.entity';
+import { AuthRoleEntity } from './entities/auth-role.entity';
+import { AuthDomainEntity } from './entities/auth-domain.entity';
 
 export const userProvider = [
   {
@@ -8,3 +10,20 @@ export const userProvider = [
     inject: ['DbConnectionToken'],
   },
 ];
+
+export const userRoleProvider = [
+  {
+    provide: 'AuthRoleRepositoryToken',
+    useFactory: (connection: Connection) => connection.getRepository(AuthRoleEntity),
+    inject: ['DbConnectionToken'],
+  },
+];
+
+export const authDomainProvider = [
+  {
+    provide: 'AuthDomainRepositoryToken',
+    useFactory: (connection: Connection) => connection.getRepository(AuthDomainEntity),
+    inject: ['DbConnectionToken'],
+  },
+];
+

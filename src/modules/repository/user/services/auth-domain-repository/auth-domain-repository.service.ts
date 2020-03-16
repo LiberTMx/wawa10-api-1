@@ -5,19 +5,18 @@ import { BaseRepository } from 'typeorm-transactional-cls-hooked';
 import * as log4js from 'log4js';
 import { Repository } from 'typeorm';
 import { AuthRoleEntity } from '../../entities/auth-role.entity';
-const logger = log4js.getLogger('UserRepositoryService');
+import { AuthDomainEntity } from '../../entities/auth-domain.entity';
+const logger = log4js.getLogger('AuthDomainRepositoryService');
 
 @Injectable()
-export class UserRepositoryService 
+export class AuthDomainRepositoryService 
 {
     constructor(
-        @Inject('AuthUserRepositoryToken')
-        private readonly userRepository: BaseRepository<AuthUserEntity>,
-        @Inject('AuthRoleRepositoryToken')
-        private readonly userRoleRepository: BaseRepository<AuthRoleEntity>,
+        @Inject('AuthDomainRepositoryToken')
+        private readonly authDomainRepository: BaseRepository<AuthDomainEntity>,
     ) {}
     
-    async findByUserName(username: string): Promise<AuthUserEntity> {
+    async findDomainById(domainId: number): Promise<AuthDomainEntity> {
         /*
         const qb = this.authUserRepository.createQueryBuilder('authUser');
         return qb.innerJoinAndSelect(AuthUserService.AUTHUSER_AUTHUSERGROUP, 'authUserGroup')

@@ -14,6 +14,7 @@ import { AuthUserEntity } from '../../../repository/user/entities/auth-user.enti
 import { CredentialRepositoryService } from '../../../repository/credential/services/credential-repository.service';
 import { CredentialEntity } from '../../../repository/credential/entities/credential.entity';
 import { MailService } from '../../../mail/services/mail/mail.service';
+import { AuthRoleEntity } from '../../../repository/user/entities/auth-role.entity';
 
 const logger = log4js.getLogger('AuthService');
 
@@ -97,7 +98,27 @@ export class AuthService
        const authUserTokens: TokensModel = new TokensModel();
        Object.assign(authUserTokens, tokens);
        authUser.tokens = authUserTokens;
-       logger.debug('User found:', authUser);
+       const roles=await this.userRepositoryService.getUserRoles(authUser.id);
+       
+       if(roles!==null && roles!==undefined)
+       {
+         if(roles.length>0)
+         {
+          const rr: AuthRoleEntity[]=new AuthRoleEntity[]();
+          for(const r of roles)
+          {
+            const role: AuthRoleEntity=this.domainRepositoryService.findDomainById(r.domain_id);
+            if(role!==null &&role!==undefined) 
+            {
+              rr.push(role);
+            }
+          }
+          authUser.roles=rr;
+         }
+
+         logger.debug('Auth User found:', authUser);
+         
+       }
        return authUser;
     }
 
