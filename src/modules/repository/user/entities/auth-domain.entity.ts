@@ -8,4 +8,7 @@ export class AuthDomainEntity {
 
     @Column()
     domain: string;
+
+    @Column()
+    commentaire: string;
 }

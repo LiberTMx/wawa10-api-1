@@ -46,6 +46,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",
+    "sendmail": "^1.6.1",
     "soap": "^0.31.0",
     "typeorm": "^0.2.22",
     "typeorm-transactional-cls-hooked": "^0.1.12",

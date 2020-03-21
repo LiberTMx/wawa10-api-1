@@ -15,6 +15,12 @@ import { CredentialRepositoryService } from '../../../repository/credential/serv
 import { CredentialEntity } from '../../../repository/credential/entities/credential.entity';
 import { MailService } from '../../../mail/services/mail/mail.service';
 import { AuthRoleEntity } from '../../../repository/user/entities/auth-role.entity';
+import { AuthDomainRepositoryService } from '../../../repository/user/services/auth-domain-repository/auth-domain-repository.service';
+import { AuthDomainEntity } from '../../../repository/user/entities/auth-domain.entity';
+import { AuthDomainModel } from '../../../repository/user/model/auth-domain.model';
+import { AuthGroupEntity } from '../../../repository/user/entities/auth-group.entity';
+import { AuthGroupRepositoryService } from '../../../repository/user/services/auth-group-repository/auth-group-repository.service';
+import { AuthGroupModel } from '../../../repository/user/model/auth-group.model';
 
 const logger = log4js.getLogger('AuthService');
 
@@ -26,6 +32,8 @@ export class AuthService
         private readonly jwtService: JwtService,
         private readonly mailService: MailService,
         private readonly userRepositoryService: UserRepositoryService,
+        private readonly authDomainRepositoryService: AuthDomainRepositoryService,
+        private readonly authGroupRepositoryService: AuthGroupRepositoryService,
         private readonly credentialRepositoryService: CredentialRepositoryService,
     ) {}
 
@@ -104,12 +112,17 @@ export class AuthService
        {
          if(roles.length>0)
          {
-          const rr: AuthRoleEntity[]=new AuthRoleEntity[]();
+          const rr: AuthRoleEntity[]=new Array<AuthRoleEntity>();
           for(const r of roles)
           {
-            const role: AuthRoleEntity=this.domainRepositoryService.findDomainById(r.domain_id);
-            if(role!==null &&role!==undefined) 
+            const domain: AuthDomainEntity=await this.authDomainRepositoryService.findDomainById(r.domain_id);
+            if(domain!==null && domain!==undefined) 
             {
+              //rr.push(role);
+              const role=new AuthRoleEntity();
+              role.id=r.id;
+              role.role=r.role;
+              role.authDomain=domain;
               rr.push(role);
             }
           }
@@ -257,4 +270,23 @@ export class AuthService
       throw new BadRequestException('Still not implemented!', '9999');
     }
 
+    async getAllAuthDomains(): Promise<AuthDomainEntity[]>
+    {
+      return await this.authDomainRepositoryService.getAllAuthDomains();
+    }
+
+    async createAuthDomain(authDomainModel: AuthDomainModel): Promise<AuthDomainEntity>
+    {
+      return await this.authDomainRepositoryService.createAuthDomain(authDomainModel);
+    }
+
+    async getAllAuthGroups(): Promise<AuthGroupEntity[]>
+    {
+      return await this.authGroupRepositoryService.getAllAuthGroups();
+    }
+
+    async createAuthGroup(authGroupModel: AuthGroupModel): Promise<AuthGroupEntity>
+    {
+      return await this.authGroupRepositoryService.createAuthGroup(authGroupModel);
+    }
 }

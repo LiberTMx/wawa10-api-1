@@ -10,6 +10,9 @@ export class AuthGroupEntity {
     @Column()
     name: string;
 
+    @Column()
+    commentaire: string;
+
     @OneToMany(type => AuthGroupRoleEntity, authGroupEntity => authGroupEntity.authGroup)
     authGroupRole: AuthGroupRoleEntity[];
 }

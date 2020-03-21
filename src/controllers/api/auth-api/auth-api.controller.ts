@@ -1,10 +1,12 @@
-import { Controller, Request, Post, HttpException, HttpStatus, Body, Headers, BadRequestException } from '@nestjs/common';
+import { Controller, Request, Post, HttpException, HttpStatus, Body, Headers, BadRequestException, Get } from '@nestjs/common';
 import { AuthService } from '../../../modules/auth/services/auth/auth.service';
 
 import * as log4js from 'log4js';
 import { CreateUserDTO } from '../../../shared/dto/create-user.dto';
 import { AuthUserEntity } from '../../../modules/repository/user/entities/auth-user.entity';
 import { validateSync } from 'class-validator';
+import { AuthDomainModel } from '../../../modules/repository/user/model/auth-domain.model';
+import { AuthGroupModel } from '../../../modules/repository/user/model/auth-group.model';
 const logger = log4js.getLogger('AuthApiController');
 
 @Controller('auth')
@@ -84,6 +86,44 @@ export class AuthApiController
     if (!body.username || !body.password || !body.jeton) throw new HttpException('Missing username, password or jeton', HttpStatus.BAD_REQUEST);
 
     return await this.authService.changePassword(body);
+  }
+
+  @Get('domainList')
+  async getAllAuthDomains(@Request() req)
+  {
+    return await this.authService.getAllAuthDomains();
+  }
+
+  @Post('domainCreate')
+  async createDomain(@Request() req, @Body() authDomainModel: AuthDomainModel)
+  {
+    logger.debug('Creating a new auth domain:', authDomainModel);
+
+    const validationErrors = validateSync(authDomainModel, { validationError: { target: false } });
+    if (validationErrors !== null && validationErrors.length > 0) 
+    {
+      throw new BadRequestException(validationErrors);
+    }
+    return await this.authService.createAuthDomain(authDomainModel);
+  }
+
+  @Get('groupList')
+  async getAllAuthGroups(@Request() req)
+  {
+    return await this.authService.getAllAuthGroups();
+  }
+
+  @Post('groupCreate')
+  async createGroup(@Request() req, @Body() authGroupModel: AuthGroupModel)
+  {
+    logger.debug('Creating a new auth group:', authGroupModel);
+
+    const validationErrors = validateSync(authGroupModel, { validationError: { target: false } });
+    if (validationErrors !== null && validationErrors.length > 0) 
+    {
+      throw new BadRequestException(validationErrors);
+    }
+    return await this.authService.createAuthGroup(authGroupModel);
   }
 
 }
