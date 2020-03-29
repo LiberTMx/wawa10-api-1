@@ -1,4 +1,5 @@
-import { PrimaryGeneratedColumn, Column, Entity } from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity, OneToOne, JoinColumn } from 'typeorm';
+import { NewsEntity } from './news.entity';
 
 @Entity({name: 'news_image'})
 export class NewsImageEntity {
@@ -9,7 +10,13 @@ export class NewsImageEntity {
     @Column({name: 'news_id'})
     newsId: number;
 
-    @Column({name: 'doc_filename'})
+    @Column({name: 'image_filename'})
     imageFilename: string;
 
+    @Column({name: 'mime_type'})
+    mimeType: string;
+
+    @OneToOne(type => NewsEntity)
+    @JoinColumn({ name: 'news_id' })
+    news: NewsEntity;
 }

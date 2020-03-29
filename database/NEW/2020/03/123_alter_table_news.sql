@@ -10,3 +10,12 @@ ALTER TABLE
 ALTER TABLE
     news ADD
         (show_order int );
+
+
+ALTER TABLE
+    news_doc ADD
+        (mime_type varchar(50) );
+
+ALTER TABLE
+    news_image ADD
+        (mime_type varchar(50) );

@@ -7,8 +7,10 @@ import { CredentialRepositoryService } from './credential/services/credential-re
 import { AuthDomainRepositoryService } from './user/services/auth-domain-repository/auth-domain-repository.service';
 import { AuthGroupRepositoryService } from './user/services/auth-group-repository/auth-group-repository.service';
 import { NewsRepositoryService } from './news/services/news/news-repository.service';
-import { newsProvider } from './news/news.providers';
+import { newsProvider, newsImageProvider, newsDocProvider } from './news/news.providers';
 import { ConfigurationModule } from '../configuration/configuration.module';
+import { NewsImageRepositoryService } from './news/services/news/news-image-repository.service';
+import { NewsDocRepositoryService } from './news/services/news/news-doc-repository.service';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { ConfigurationModule } from '../configuration/configuration.module';
     AuthDomainRepositoryService,
     AuthGroupRepositoryService,
     NewsRepositoryService,
+    NewsImageRepositoryService,
+    NewsDocRepositoryService,
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
@@ -28,6 +32,8 @@ import { ConfigurationModule } from '../configuration/configuration.module';
     AuthDomainRepositoryService, ...authDomainProvider, 
     AuthGroupRepositoryService, ...authGroupProvider, 
     NewsRepositoryService,...newsProvider,
+    NewsImageRepositoryService, ...newsImageProvider,
+    NewsDocRepositoryService, ...newsDocProvider,
   ],
 })
 export class RepositoryModule {}

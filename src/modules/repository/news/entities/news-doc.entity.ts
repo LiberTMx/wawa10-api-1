@@ -5,7 +5,8 @@ news_id int not null,
 doc_filename varchar(255) NOT NULL,
 */
 
-import { PrimaryGeneratedColumn, Column, Entity } from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity, OneToOne, JoinColumn } from 'typeorm';
+import { NewsEntity } from './news.entity';
 
 @Entity({name: 'news_doc'})
 export class NewsDocEntity {
@@ -18,5 +19,11 @@ export class NewsDocEntity {
 
     @Column({name: 'doc_filename'})
     docFilename: string;
+    
+    @Column({name: 'mime_type'})
+    mimeType: string;
 
+    @OneToOne(type => NewsEntity)
+    @JoinColumn({ name: 'news_id' })
+    news: NewsEntity;
 }
