@@ -4,6 +4,7 @@ import { MessageDTO } from '../../../shared/dto/contact/message.dto';
 import * as log4js from 'log4js';
 import { validateSync } from 'class-validator';
 import { ContactService } from '../../../modules/contact/services/contact/contact.service';
+import { EmailDestinationType } from '../../../modules/mail/types/email-destination-type.enum';
 const logger = log4js.getLogger('AuthApiController');
 
 @Controller('contact')
@@ -24,6 +25,7 @@ export class ContactApiController
             throw new BadRequestException('Contact message validation error(s): ' + validationErrors);
         }
 
+        messageDTO.destinationType=EmailDestinationType.TO_CLUB;
         return await this.contactService.sendMessage(messageDTO);
     }
 }

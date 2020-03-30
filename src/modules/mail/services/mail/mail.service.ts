@@ -5,6 +5,7 @@ import * as sendmail from 'sendmail';
 
 import * as log4js from 'log4js';
 import { MessageDTO } from '../../../../shared/dto/contact/message.dto';
+import { EmailDestinationType } from '../../types/email-destination-type.enum';
 const logger = log4js.getLogger('MailService');
 
 enum MailTranportType
@@ -17,7 +18,7 @@ enum MailTranportType
 export class MailService 
 {
 
-    mailTranportType: MailTranportType = MailTranportType.nodemailer;
+    //mailTranportType: MailTranportType = MailTranportType.nodemailer;
     //mailTranportType: MailTranportType = MailTranportType.sendmail;
 
     /*
@@ -26,7 +27,49 @@ export class MailService
         Site2$2020
     */
 
-    sendMailToUser(user: AuthUserEntity, message: string): void
+    /*
+   sendMailToUser(user: AuthUserEntity, messageDTO: MessageDTO): void
+   {
+        const env = process.env.site2_env;
+        logger.debug('Sending message by email - env: '+env);
+
+        logger.debug('Received user message to be relayed: ', messageDTO);
+
+        let mailTo='guy.kaisin@gmail.com';
+        mailTo+=', secretariat@liwa.be';
+
+        const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        //port: 587,
+        //secure: false,
+        auth: {
+            user: 'ctt.limal.wavre.site2@gmail.com',
+            pass: 'Site2$2020',
+        },
+        });
+
+        const mailOptions = {
+            from: 'CTT Limal-Wavre - Contact <ctt.limal.wavre.site2@gmail.com>',
+            to: mailTo,
+            subject: 'Test Contact nouveau site: '+messageDTO.subject,
+            html: messageDTO.message,
+        };
+        
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                logger.error(error);
+            } else {
+                logger.debug('Email sent: ' + info.response);
+            }
+        });
+
+        transporter.close();
+    }
+
+    sendMailToUser_old(user: AuthUserEntity, message: string): void
     {
         switch(this.mailTranportType)
         {
@@ -75,32 +118,23 @@ export class MailService
             logger.debug(err && err.stack);
             logger.debug(reply);
         });
-        */
+        * /
 
         const mailTo='guy.kaisin@gmail.com';
 
-        
         const transporter = nodemailer.createTransport({
-            /*
             service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            //port: 587,
+            //secure: false,
             auth: {
-            user: 'ctt.limal.wavre.site2@gmail.com',
-            pass: 'Site2$2020',
+                user: 'ctt.limal.wavre.site2@gmail.com',
+                pass: 'Site2$2020',
             },
-            */
-
-           service: 'gmail',
-           host: 'smtp.gmail.com',
-           //port: 465,
-           //secure: true,
-           auth: {
-               user: 'ctt.limal.wavre.site2@gmail.com',
-               pass: 'Site2$2020',
-           },
-            
-        });
+         });
         
-
         /*
         const transporter = nodemailer.createTransport({
             host: 'smtp.ethereal.email',
@@ -110,7 +144,7 @@ export class MailService
                 pass: 'kHKY2KRX4338xwCvGq',
             },
         });
-        */
+        * /
         
         const mailOptions = {
             from: 'CTT Limal-Wavre <ctt.limal.wavre.site2@gmail.com>',
@@ -130,7 +164,9 @@ export class MailService
         transporter.close();
       
     }
+    */
 
+    /*
     sendMessage(messageDTO: MessageDTO): void
     {
         switch(this.mailTranportType)
@@ -145,8 +181,9 @@ export class MailService
                 logger.error('transport type not supported!', this.mailTranportType);
         }
     }
+    /*
 
-    private nodemailer_sendMessage(messageDTO: MessageDTO): void
+    private /*nodemailer_sendMessage*/ sendMessage(messageDTO: MessageDTO): void
     {
         const env = process.env.site2_env;
         logger.debug('Sending message by email - env: '+env);
@@ -156,13 +193,22 @@ export class MailService
         let mailTo='guy.kaisin@gmail.com';
         mailTo+=', secretariat@liwa.be';
 
+        if(messageDTO.destinationType === EmailDestinationType.TO_USER)
+        {
+            logger.debug('Prepare message for user', mailTo, messageDTO.email);
+            mailTo=messageDTO.email;
+            // messageDTO.message='USER message intercepté';
+        }
+
         const transporter = nodemailer.createTransport({
            service: 'gmail',
+           /*
            host: 'smtp.gmail.com',
            port: 465,
            secure: true,
            //port: 587,
            //secure: false,
+           */
            auth: {
                user: 'ctt.limal.wavre.site2@gmail.com',
                pass: 'Site2$2020',
@@ -170,9 +216,9 @@ export class MailService
         });
 
         const mailOptions = {
-            from: 'CTT Limal-Wavre - Contact <ctt.limal.wavre.site2@gmail.com>',
+            from: 'CTT Limal-Wavre <ctt.limal.wavre.site2@gmail.com>',
             to: mailTo,
-            subject: 'Test Contact nouveau site: '+messageDTO.subject,
+            subject: messageDTO.subject,
             html: messageDTO.message,
         };
         
@@ -184,9 +230,10 @@ export class MailService
             }
         });
 
-        transporter.close();
+        //transporter.close();
     }
 
+    /*
     private sendmail_sendMessage(messageDTO: MessageDTO): void
     {
         const env = process.env.site2_env;
@@ -209,4 +256,5 @@ export class MailService
             logger.debug(reply);
         });
     }
+    */
 }

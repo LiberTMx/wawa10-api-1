@@ -1,3 +1,5 @@
+-- use eoycwjpsite2;
+
 ALTER TABLE
     auth_group ADD
         (commentaire varchar(1000) default null );

@@ -21,6 +21,8 @@ import { AuthDomainModel } from '../../../repository/user/model/auth-domain.mode
 import { AuthGroupEntity } from '../../../repository/user/entities/auth-group.entity';
 import { AuthGroupRepositoryService } from '../../../repository/user/services/auth-group-repository/auth-group-repository.service';
 import { AuthGroupModel } from '../../../repository/user/model/auth-group.model';
+import { MessageDTO } from '../../../../shared/dto/contact/message.dto';
+import { EmailDestinationType } from '../../../mail/types/email-destination-type.enum';
 
 const logger = log4js.getLogger('AuthService');
 
@@ -92,10 +94,17 @@ export class AuthService
          try
          {
            const mailMessage=this.buildMailMessageForChangePasswordJeton(currentUser);
-           this.mailService.sendMailToUser(currentUser, mailMessage);
+           const msg= new MessageDTO();
+           msg.email=currentUser.email;
+           msg.message='Votre jeton pour votre nouveau mot de passe: '+ currentUser.changePasswordJeton;
+           msg.subject='CTT Limal-Wavre - Jeton';
+           msg.name='noop';
+           msg.destinationType=EmailDestinationType.TO_USER;
+           this.mailService.sendMessage(msg);
          }
          catch(e)
          {
+           logger.error('Error sending mail !', e);
            // nothing
          }
        }

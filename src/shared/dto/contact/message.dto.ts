@@ -1,4 +1,5 @@
 import { MinLength, IsEmail } from 'class-validator';
+import { EmailDestinationType } from '../../../modules/mail/types/email-destination-type.enum';
 
 export class MessageDTO
 {
@@ -18,4 +19,6 @@ export class MessageDTO
     @MinLength(1, { // here, $constraint1 will be replaced with "1", and $value with actual supplied value
     message: 'firstname is too short. Minimal length is $constraint1 characters, but actual is $value' })
     message: string;
+
+    destinationType: EmailDestinationType;
 }
