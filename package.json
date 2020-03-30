@@ -43,6 +43,7 @@
     "mysql": "^2.18.1",
     "nest-logger": "^4.0.1",
     "nodemailer": "^6.4.4",
+    "path": "^0.12.7",
     "pretty-error": "^2.1.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",

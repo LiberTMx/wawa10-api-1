@@ -17,6 +17,11 @@ export class NewsDocRepositoryService
         return this.newsDocRepository.save(newsDoc);
     }
 
+    async findDocumentAttachedToNews(newsId: number): Promise<NewsDocEntity> 
+    {
+        return this.newsDocRepository.findOne({where: { /*newsId:*/ newsId}});
+    }
+
     async createNewsDoc(news: NewsEntity, docFilename: string, mimeType: string): Promise<NewsDocEntity>
     {
         const doc = new NewsDocEntity();

@@ -28,4 +28,8 @@ export class NewsImageRepositoryService
         return this.saveNewsImage(image);
     }
 
+    async findImageAttachedToNews(newsId: number): Promise<NewsImageEntity> 
+    {
+        return this.newsImageRepository.findOne({where: { /*newsId:*/ newsId}});
+    }
 }

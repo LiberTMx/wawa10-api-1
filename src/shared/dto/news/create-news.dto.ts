@@ -1,5 +1,6 @@
 
 import { IsEmail, MinLength } from 'class-validator';
+import { NewsType } from '../../../modules/news/types/news-status.enum';
 
 /*
       id
@@ -34,7 +35,7 @@ export class CreateNewsDTO {
 
     @MinLength(1, { // here, $constraint1 will be replaced with "1", and $value with actual supplied value
     message: 'status is too short. Minimal length is $constraint1 characters, but actual is $value' })
-    status: string;
+    status: NewsType;
 
     externalLink: string;
 
