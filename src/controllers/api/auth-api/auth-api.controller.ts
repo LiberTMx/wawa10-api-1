@@ -1,4 +1,4 @@
-import { Controller, Request, Post, HttpException, HttpStatus, Body, Headers, BadRequestException, Get } from '@nestjs/common';
+import { Controller, Request, Post, HttpException, HttpStatus, Body, Headers, BadRequestException, Get, Query } from '@nestjs/common';
 import { AuthService } from '../../../modules/auth/services/auth/auth.service';
 
 import * as log4js from 'log4js';
@@ -126,4 +126,21 @@ export class AuthApiController
     return await this.authService.createAuthGroup(authGroupModel);
   }
 
+  @Get('liste')
+  async getNewsList(@Query() query): Promise<AuthUserEntity[]>
+  {
+      const readAll = query.readAll;
+      const all: boolean = (readAll!==null && readAll!==undefined && (readAll==='1' || readAll==='true') );
+      logger.debug('user list - readAll:', all);
+      const users=await this.authService.getUserList(all);
+      if(users!==null && users!==undefined && users.length>0)
+      {
+        // remove password !
+        for(const u of users)
+        {
+          u.password=null;
+        }
+      }
+      return users;
+  }
 }

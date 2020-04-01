@@ -1,3 +1,5 @@
+-- use eoycwjpsite2;
+
 ALTER TABLE news_doc
 DROP FOREIGN KEY news_doc_fk;
 

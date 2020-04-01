@@ -298,4 +298,9 @@ export class AuthService
     {
       return await this.authGroupRepositoryService.createAuthGroup(authGroupModel);
     }
+
+    async getUserList(readAll: boolean = false): Promise<AuthUserEntity[]>
+    {
+      return await this.userRepositoryService.getUserList(readAll);
+    }
 }

@@ -13,6 +13,7 @@ export class UserRepositoryService
     constructor(
         @Inject('AuthUserRepositoryToken')
         private readonly userRepository: BaseRepository<AuthUserEntity>,
+
         @Inject('AuthRoleRepositoryToken')
         private readonly userRoleRepository: BaseRepository<AuthRoleEntity>,
     ) {}
@@ -76,4 +77,26 @@ export class UserRepositoryService
     {
         return this.userRepository.save(user);
     }
+
+    async getUserList(readAll: boolean = false): Promise<AuthUserEntity[]>
+    {
+        if(readAll===true)
+        {
+            logger.info('retrieveing all users, even marked deleted');
+
+            return this.userRepository
+            .createQueryBuilder('authUser')
+            //.where(' authUser.deletedAt is null ')
+            .orderBy('authUser.nom', 'ASC')
+            .addOrderBy('authUser.prenom', 'ASC')
+            .getMany();
+        }
+
+        return this.userRepository
+            .createQueryBuilder('authUser')
+            .where(' authUser.deletedAt is null ')
+            .orderBy('authUser.nom', 'ASC')
+            .addOrderBy('authUser.prenom', 'ASC')
+            .getMany();
+    } 
 }
