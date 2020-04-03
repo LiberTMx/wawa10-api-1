@@ -11,6 +11,7 @@ import { SoapModule } from './modules/soap/soap.module';
 import { MailModule } from './modules/mail/mail.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { NewsModule } from './modules/news/news.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { NewsModule } from './modules/news/news.module';
     MailModule,
     ContactModule,
     NewsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

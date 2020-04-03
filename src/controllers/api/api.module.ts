@@ -9,6 +9,7 @@ import { NewsApiController } from './news-api/news-api.controller';
 import { NewsModule } from '../../modules/news/news.module';
 import { ConfigurationModule } from '../../modules/configuration/configuration.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { AdminModule } from '../../modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MulterModule } from '@nestjs/platform-express';
       dest: './files',
     }),
     AuthModule,
+    AdminModule,
     SoapModule,
     ContactModule,
     NewsModule,

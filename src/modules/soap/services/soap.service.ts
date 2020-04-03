@@ -45,7 +45,7 @@ export class SoapService
 
     getCredentials(): any
     {
-        return {username: 148858, password: 2099};
+        return {Account: 148858, Password: 2099};
     }
 
     /*
@@ -71,7 +71,7 @@ export class SoapService
     }
     */
 
-    async getTeamList(): Promise<any>
+    async getTeamList(stringify: boolean = false): Promise<any>
     {
         /*
         $Credentials = array('Account'  => self::VTTL_ACCOUNT_USER,
@@ -83,7 +83,7 @@ export class SoapService
             ));
         */
         const credentials=this.getCredentials();
-        const args={ credentials, Club: 'bbw123'};
+        const args={ Credentials: credentials, Club: 'bbw123'};
         const cwd = process.cwd();
         let url= cwd + '/config/wsdl/aftt.tabt.wsdl.xml';
         url='https://resultats.aftt.be/api/?wsdl';
@@ -107,8 +107,16 @@ export class SoapService
                         }
                         else
                         {
-                            const resp=JSON.stringify(result);
-                            resolve({data: result, err: null});
+                            if(stringify)
+                            {
+                                const resp=JSON.stringify(result);
+                                resolve({data: resp, err: null});
+                            }
+                            else
+                            {
+                                resolve({data: result, err: null});
+                            }
+                            
                         }
                     });
                 }
@@ -116,6 +124,144 @@ export class SoapService
         });
         return p2;
 
+    }
+
+    async getDivisionList(stringify: boolean = false): Promise<any>
+    {
+        /*
+        $Credentials = array('Account'  => self::VTTL_ACCOUNT_USER,
+                'Password' =>self::VTTL_ACCOUNT_PSWD);
+             
+        $Response = $tabt->GetClubTeams(
+            array('Credentials' => $this->getTabtCredentials(), 
+                    'Club' => self::MY_CLUB_INDICE,
+            ));
+        */
+        const credentials=this.getCredentials();
+        const args={ Credentials: credentials, Club: 'bbw123'};
+        const cwd = process.cwd();
+        let url= cwd + '/config/wsdl/aftt.tabt.wsdl.xml';
+        url='https://resultats.aftt.be/api/?wsdl';
+
+        const p2=new Promise( (resolve, reject) => {
+            soap.createClient(url /*this.afttWsld*/ , (err, client) => {
+                if(client==null || client===undefined)
+                {
+                    logger.warn('client is null !', err);
+                    resolve({data:null, err});
+                }
+                else
+                {
+                    client.GetDivisions(args, (err1, result) => {
+                        //logger.error('err?', err);
+                        //logger.info(JSON.stringify(result) );
+                        if(err1)
+                        {
+                            logger.warn('Error calling client.GetDivisions', err1);
+                            resolve({data:null, err: err1});
+                        }
+                        else
+                        {
+                            if(stringify)
+                            {
+                                const resp=JSON.stringify(result);
+                                resolve({data: resp, err: null});
+                            }
+                            else
+                            {
+                                resolve({data: result, err: null});
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        return p2;
+
+    }
+
+    async getMatches(stringify: boolean = false): Promise<any>
+    {
+        const credentials=this.getCredentials();
+        const args={ Credentials: credentials, Club: 'bbw123'};
+        const cwd = process.cwd();
+        let url= cwd + '/config/wsdl/aftt.tabt.wsdl.xml';
+        url='https://resultats.aftt.be/api/?wsdl';
+
+        const p2=new Promise( (resolve, reject) => {
+            soap.createClient(url /*this.afttWsld*/ , (err, client) => {
+                if(client==null || client===undefined)
+                {
+                    logger.warn('client is null !', err);
+                    resolve({data:null, err});
+                }
+                else
+                {
+                    client.GetMatches(args, (err1, result) => {
+                        if(err1)
+                        {
+                            logger.warn('Error calling client.GetMatches', err1);
+                            resolve({data:null, err: err1});
+                        }
+                        else
+                        {
+                            if(stringify)
+                            {
+                                const resp=JSON.stringify(result);
+                                resolve({data: resp, err: null});
+                            }
+                            else
+                            {
+                                resolve({data: result, err: null});
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        return p2;
+    }
+
+    async getMembres(playerCategory: number =1, stringify: boolean = false): Promise<any>
+    {
+        const credentials=this.getCredentials();
+        const args={ Credentials: credentials, Club: 'bbw123', ExtendedInformation: '1', PlayerCategory: playerCategory};
+        const cwd = process.cwd();
+        let url= cwd + '/config/wsdl/aftt.tabt.wsdl.xml';
+        url='https://resultats.aftt.be/api/?wsdl';
+
+        const p2=new Promise( (resolve, reject) => {
+            soap.createClient(url /*this.afttWsld*/ , (err, client) => {
+                if(client==null || client===undefined)
+                {
+                    logger.warn('client is null !', err);
+                    resolve({data:null, err});
+                }
+                else
+                {
+                    client.GetMembers(args, (err1, result) => {
+                        if(err1)
+                        {
+                            logger.warn('Error calling client.GetMembers', err1);
+                            resolve({data:null, err: err1});
+                        }
+                        else
+                        {
+                            if(stringify)
+                            {
+                                const resp=JSON.stringify(result);
+                                resolve({data: resp, err: null});
+                            }
+                            else
+                            {
+                                resolve({data: result, err: null});
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        return p2;
     }
 
 }

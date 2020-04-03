@@ -11,6 +11,8 @@ import { newsProvider, newsImageProvider, newsDocProvider } from './news/news.pr
 import { ConfigurationModule } from '../configuration/configuration.module';
 import { NewsImageRepositoryService } from './news/services/news/news-image-repository.service';
 import { NewsDocRepositoryService } from './news/services/news/news-doc-repository.service';
+import { afttAllDataProvider, afttTeamProvider, afttDivisionProvider } from './aftt/aftt.providers';
+import { AfttRepositoryService } from './aftt/services/aftt-repository.service';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { NewsDocRepositoryService } from './news/services/news/news-doc-reposito
     NewsRepositoryService,
     NewsImageRepositoryService,
     NewsDocRepositoryService,
+    AfttRepositoryService,
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
@@ -34,6 +37,7 @@ import { NewsDocRepositoryService } from './news/services/news/news-doc-reposito
     NewsRepositoryService,...newsProvider,
     NewsImageRepositoryService, ...newsImageProvider,
     NewsDocRepositoryService, ...newsDocProvider,
+    AfttRepositoryService, ...afttAllDataProvider, ...afttTeamProvider, ...afttDivisionProvider,
   ],
 })
 export class RepositoryModule {}
