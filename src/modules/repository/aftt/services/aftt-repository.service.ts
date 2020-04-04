@@ -6,6 +6,9 @@ import { AfttAllDataEntity } from '../entities/aftt-all-data.entity';
 import {getConnection} from 'typeorm';
 import { AfttTeamEntity } from '../entities/aftt-team.entity';
 import { AfttDivisionEntity } from '../entities/aftt-division.entity';
+import { AfttMatchEntity } from '../entities/aftt-match.entity';
+import { AfttDivisionCategoryEntity } from '../entities/aftt-division-category.entity';
+import { AfttMemberByCategoryEntity } from '../entities/aftt-member-by-category.entity';
 const logger = log4js.getLogger('AfttRepositoryService');
 
 @Injectable()
@@ -18,6 +21,12 @@ export class AfttRepositoryService
         private readonly afttTeamRepository: BaseRepository<AfttTeamEntity>,
         @Inject('afttDivisionRepositoryToken')
         private readonly afttDivisionRepository: BaseRepository<AfttDivisionEntity>,
+        @Inject('afttDivisionCategoryRepositoryToken')
+        private readonly afttDivisionCategoryRepository: BaseRepository<AfttDivisionCategoryEntity>,
+        @Inject('afttMatchRepositoryToken')
+        private readonly afttMatchRepository: BaseRepository<AfttMatchEntity>,
+        @Inject('afttMemberByCategoryEntityRepositoryToken')
+        private readonly afttMemberByCategoryEntityRepository: BaseRepository<AfttMemberByCategoryEntity>,
     ) {}
     
     async save(allData: AfttAllDataEntity): Promise<AfttAllDataEntity>
@@ -125,6 +134,23 @@ export class AfttRepositoryService
         }
     }
 
+    async getLastAfttSyncId(): Promise<any>
+    {
+        const rawData: any=this.afttAllDataRepository.query(
+            'SELECT  id, created_at as createdAt '+
+            'FROM aftt_all_data aftt  ' +
+            'INNER JOIN  ' +
+            '( ' +
+            'SELECT  ' +
+            'MAX(created_at) max_time ' +
+            'FROM aftt_all_data ' +
+            //'GROUP BY Date(`created_at`) ' +
+            ') AS t ' +
+            'ON aftt.created_at = t.max_time'  );
+
+        return rawData;
+    }
+
     @Transactional()
     async removeAllAfttDataForSync(syncId: number)
     {
@@ -133,6 +159,13 @@ export class AfttRepositoryService
                 .execute();
 
         await getConnection().createQueryBuilder().delete().from(AfttDivisionEntity)
+                .where('aftt_LastSyncId = :syncId', { syncId })
+                .execute();
+
+        await getConnection().createQueryBuilder().delete().from(AfttMatchEntity)
+                .where('aftt_LastSyncId = :syncId', { syncId })
+                .execute();
+        await getConnection().createQueryBuilder().delete().from(AfttMemberByCategoryEntity)
                 .where('aftt_LastSyncId = :syncId', { syncId })
                 .execute();
         //await this.afttRepositoryService.removeAllAfttDataForSync(syncId);
@@ -147,4 +180,54 @@ export class AfttRepositoryService
     {
         return this.afttDivisionRepository.save(division);
     }
+
+    async saveAfttMatch(match: AfttMatchEntity): Promise<AfttMatchEntity>
+    {
+        return this.afttMatchRepository.save(match);
+    }
+
+    async getDivisionCategoryList(): Promise<AfttDivisionCategoryEntity[]>
+    {
+        return this.afttDivisionCategoryRepository
+            .find({ order: { order: 'ASC' } });
+    }
+
+    async saveAfttMemberByCategory(membre: AfttMemberByCategoryEntity): Promise<AfttMemberByCategoryEntity>
+    {
+        return this.afttMemberByCategoryEntityRepository.save(membre);
+    }
+
+    async getAfttDivisions(syncId: number): Promise<AfttDivisionEntity[]>
+    {
+        return this.afttDivisionRepository
+            .createQueryBuilder('aftt_division')
+            .where(' aftt_division.aftt_LastSyncId = :syncId', { syncId })
+            //.andWhere(' news.id = document.newsId')
+            //.orderBy('news.showOrder')
+            //.addOrderBy('news.createdAt DESC')
+            .getMany();
+    }
+
+    async getAfttTeams(syncId: number): Promise<AfttTeamEntity[]>
+    {
+        return this.afttTeamRepository
+            .createQueryBuilder('aftt_division')
+            .where(' aftt_division.aftt_LastSyncId = :syncId', { syncId })
+            //.andWhere(' news.id = document.newsId')
+            //.orderBy('news.showOrder')
+            //.addOrderBy('news.createdAt DESC')
+            .getMany();
+    }
+
+    async getAfttMembers(syncId: number): Promise<AfttMemberByCategoryEntity[]>
+    {
+        return this.afttMemberByCategoryEntityRepository
+            .createQueryBuilder('aftt_member_by_category')
+            .where(' aftt_member_by_category.aftt_LastSyncId = :syncId', { syncId })
+            //.andWhere(' news.id = document.newsId')
+            //.orderBy('news.showOrder')
+            //.addOrderBy('news.createdAt DESC')
+            .getMany();
+    }
+
 }

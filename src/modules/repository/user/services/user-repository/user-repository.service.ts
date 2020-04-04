@@ -3,7 +3,6 @@ import { AuthUserEntity } from '../../entities/auth-user.entity';
 import { BaseRepository } from 'typeorm-transactional-cls-hooked';
 
 import * as log4js from 'log4js';
-import { Repository } from 'typeorm';
 import { AuthRoleEntity } from '../../entities/auth-role.entity';
 const logger = log4js.getLogger('UserRepositoryService');
 
