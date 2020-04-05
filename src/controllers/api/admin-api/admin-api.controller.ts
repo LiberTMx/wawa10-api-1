@@ -9,6 +9,7 @@ import { AfttDivisionEntity } from '../../../modules/repository/aftt/entities/af
 import { AfttMatchEntity } from '../../../modules/repository/aftt/entities/aftt-match.entity';
 import { AfttDivisionCategoryEntity } from '../../../modules/repository/aftt/entities/aftt-division-category.entity';
 import { AfttMemberByCategoryEntity } from '../../../modules/repository/aftt/entities/aftt-member-by-category.entity';
+import { ResponseMessage } from '../../../shared/dto/response-message.dto';
 const logger = log4js.getLogger('AdminApiController');
 
 @Controller('admin')
@@ -45,7 +46,7 @@ export class AdminApiController
     }
 
     @Get('allFromAftt')
-    async getAllFromAftt(@Request() req): Promise<AfttAllDataEntity>
+    async getAllFromAftt(@Request() req): Promise<ResponseMessage>
     {
       let teams: string = await this.soapService.getTeamList();
       if(teams===null || teams===undefined)
@@ -56,10 +57,20 @@ export class AdminApiController
       teams=JSON.stringify(teams);
       
       let divisions = await this.soapService.getDivisionList();
+      if(divisions===null || divisions===undefined)
+      {
+        logger.error('Unable to read divisions data !');
+        throw new BadRequestException('Unable to read divisions data !');
+      }
       divisions=JSON.stringify(divisions);
       //logger.debug('divisions:', divisions);
 
       let matches = await this.soapService.getMatches();
+      if(matches===null || matches===undefined)
+      {
+        logger.error('Unable to read matches data !');
+        throw new BadRequestException('Unable to read matches data !');
+      }
       matches=JSON.stringify(matches);
       //logger.debug('matches:', matches);
       const categories: AfttDivisionCategoryEntity[]=await this.adminService.getDivisionCategoryList();
@@ -71,21 +82,7 @@ export class AdminApiController
         const data = await this.soapService.getMembres(cat.playercategory);
         membresArray.push( {data, category: cat.playercategory} );
       }
-      /*
-      const messieurs = await this.soapService.getMembres(1);
-      const dames = await this.soapService.getMembres(2);
-      const veterans = await this.soapService.getMembres(3);
-      const ainees = await this.soapService.getMembres(4);
-      const jeunes = await this.soapService.getMembres(13);
-      */
-      /*
-      const membresArray=[ 
-        {messieurs, category: 1}, 
-        {dames, category: 2}, 
-        {veterans, category: 3}, 
-        {ainees, category: 4}, 
-        {jeunes, category: 13},
-      ];*/
+ 
       const membres=JSON.stringify(membresArray);
       //logger.debug('membres:', membres);
 
@@ -94,7 +91,11 @@ export class AdminApiController
       logger.debug('matches length:'+matches.length);
       logger.debug('membres length:'+membres.length);
 
-      return await this.adminService.createAfttAllData(teams, divisions, matches, membres);
+      logger.debug('persisting last sync data...');
+      const afttData: AfttAllDataEntity=await this.adminService.createAfttAllData(teams, divisions, matches, membres);
+
+      logger.debug('Last sync data persisted!', afttData.id);
+      return new ResponseMessage('ok', '200');
     }
 
     @Get('lastAfttSync')
@@ -119,7 +120,7 @@ export class AdminApiController
     }
 
     @Get('processLastSync')
-    async processLastSync(): Promise<any>
+    async processLastSync(): Promise<ResponseMessage>
     {
       const lastSync=await this.adminService.getLastAfttSync();
       if(lastSync===null || lastSync===undefined) return null;
@@ -156,7 +157,7 @@ export class AdminApiController
         }
       }
 
-      return 'ok';
+      return new ResponseMessage('ok', '200');
     }
 
     processTeams(lastSyncId: number, teamsData: any)
