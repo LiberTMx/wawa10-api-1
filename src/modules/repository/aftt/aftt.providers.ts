@@ -5,6 +5,7 @@ import { AfttDivisionEntity } from './entities/aftt-division.entity';
 import { AfttMatchEntity } from './entities/aftt-match.entity';
 import { AfttDivisionCategoryEntity } from './entities/aftt-division-category.entity';
 import { AfttMemberByCategoryEntity } from './entities/aftt-member-by-category.entity';
+import { AfttWeekByCategory } from './entities/aftt-week-by-category.entity';
 
 export const afttAllDataProvider = [
     {
@@ -52,6 +53,15 @@ export const afttMemberByCategoryProvider = [
   {
     provide: 'afttMemberByCategoryEntityRepositoryToken',
     useFactory: (connection: Connection) => connection.getRepository(AfttMemberByCategoryEntity),
+    inject: ['DbConnectionToken'],
+  },
+];
+
+// AfttWeekByCategory
+export const afttWeekByCategoryProvider = [
+  {
+    provide: 'afttWeekByCategoryEntityRepositoryToken',
+    useFactory: (connection: Connection) => connection.getRepository(AfttWeekByCategory),
     inject: ['DbConnectionToken'],
   },
 ];

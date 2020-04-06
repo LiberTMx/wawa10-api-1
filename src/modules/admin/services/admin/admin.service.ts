@@ -9,6 +9,8 @@ import { AfttDivisionEntity } from '../../../repository/aftt/entities/aftt-divis
 import { AfttMatchEntity } from '../../../repository/aftt/entities/aftt-match.entity';
 import { AfttDivisionCategoryEntity } from '../../../repository/aftt/entities/aftt-division-category.entity';
 import { AfttMemberByCategoryEntity } from '../../../repository/aftt/entities/aftt-member-by-category.entity';
+import { AfttWeekByCategory } from '../../../repository/aftt/entities/aftt-week-by-category.entity';
+import { WeekInfo } from '../../../../shared/week.info';
 const logger = log4js.getLogger('AdminService');
 
 @Injectable()
@@ -155,5 +157,34 @@ export class AdminService
     async getAfttMembers(syncId: number): Promise<AfttMemberByCategoryEntity[]>
     {
       return this.afttRepositoryService.getAfttMembers(syncId);
+    }
+
+    async getAfttMatches(syncId: number): Promise<AfttMatchEntity[]>
+    {
+      return this.afttRepositoryService.getAfttMatches(syncId);
+    }
+
+    async findDivisionById(divisionId: number): Promise<AfttDivisionEntity>
+    {
+        return this.afttRepositoryService.findDivisionById(divisionId);
+    }
+
+    async deleteAllWeeks(syncId: number)
+    {
+        await this.afttRepositoryService.deleteAllWeeks(syncId);
+    }
+
+    async createAfttWeek(syncId: number, category: AfttDivisionCategoryEntity, weekInfo: WeekInfo): Promise<AfttWeekByCategory>
+    {
+        const week=new AfttWeekByCategory();
+        week.lastSyncId=syncId;
+        week.divisionCategoryId=category.id;
+        Object.assign(week, weekInfo);
+        return await this.saveAfttWeek(week);
+    }
+
+    async saveAfttWeek(week: AfttWeekByCategory): Promise<AfttWeekByCategory>
+    {
+        return this.afttRepositoryService.saveAfttWeek(week);
     }
 }

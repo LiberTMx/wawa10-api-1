@@ -3,6 +3,7 @@ import { SoapService } from '../../../modules/soap/services/soap.service';
 import { AfttAllDataEntity } from '../../../modules/repository/aftt/entities/aftt-all-data.entity';
 import { AdminService } from '../../../modules/admin/services/admin/admin.service';
 
+import * as DateFNS from 'date-fns';
 import * as log4js from 'log4js';
 import { AfttTeamEntity } from '../../../modules/repository/aftt/entities/aftt-team.entity';
 import { AfttDivisionEntity } from '../../../modules/repository/aftt/entities/aftt-division.entity';
@@ -10,6 +11,8 @@ import { AfttMatchEntity } from '../../../modules/repository/aftt/entities/aftt-
 import { AfttDivisionCategoryEntity } from '../../../modules/repository/aftt/entities/aftt-division-category.entity';
 import { AfttMemberByCategoryEntity } from '../../../modules/repository/aftt/entities/aftt-member-by-category.entity';
 import { ResponseMessage } from '../../../shared/dto/response-message.dto';
+import { WeekInfo } from '../../../shared/week.info';
+import { be } from 'date-fns/locale';
 const logger = log4js.getLogger('AdminApiController');
 
 @Controller('admin')
@@ -156,6 +159,8 @@ export class AdminApiController
           this.processCategoryMembres(lastSync.id, ma);
         }
       }
+
+      await this.buildAfttWeeks();
 
       return new ResponseMessage('ok', '200');
     }
@@ -384,5 +389,162 @@ export class AdminApiController
     {
       const syncId = req.params.syncId;
       return this.adminService.getAfttMembers(syncId);
+    }
+
+    @Get('buildWeeks')
+    async buildWeeks(@Request() req): Promise<ResponseMessage>
+    {
+      return new ResponseMessage('ok', '200');
+    }
+
+    async buildAfttWeeks()
+    {
+      const lastSyncIdInfo: AfttAllDataEntity =  await this.adminService.getLastAfttSyncId();
+      const syncId: number = lastSyncIdInfo.id;
+
+      const matches: AfttMatchEntity[] = await this.adminService.getAfttMatches(syncId);
+      await this.adminService.deleteAllWeeks(syncId);
+
+      /*
+      let isInError: boolean=false;
+
+      if(matches!==null && matches!==undefined && matches.length>0)
+      {
+        const weekMap = new Map<string,number>();
+        for(const match of matches)
+        {
+          if(match.matchDate===null || match.matchDate===undefined) continue;
+
+          // const date: Date = DateFNS.parse(match.matchDate);
+          const afttWeekName=match.WeekName;
+          const r = weekMap.get(afttWeekName);
+          const weekNumber=DateFNS.getWeek(match.matchDate);
+          //logger.debug('Week of date '+match.matchDate+' is: '+weekNumber);
+
+          if(r===null || r===undefined)
+          {
+            weekMap.set(afttWeekName, weekNumber);
+          }
+          else
+          {
+            if(r!==weekNumber)
+            {
+              logger.error('weekname '+afttWeekName+' is associated to more then one weekNumber: '+r+' and '+weekNumber);
+              isInError=true;
+            }
+          }
+        }
+
+        logger.info('Weeks evaluation done - is in error ?'+isInError);
+      }
+      */
+
+      //if( isInError === true )
+      {
+        let isInError: boolean=false;
+        logger.info('Checking weeks can be built by category...');
+
+        // Faut faire le meme exercice mais par categorie
+        const categories: AfttDivisionCategoryEntity[] = await this.adminService.getDivisionCategoryList();
+        let division: AfttDivisionEntity=null;
+        let divisionId=null;
+        for(const cat of categories)
+        {
+          isInError = false;
+          let weekMap=null;
+          let weekInfo=null;
+          const matchesByCat = matches.filter( m => (+m.DivisionCategory) === (+cat.playercategory) );
+          if(matchesByCat!==null && matchesByCat!==undefined && matchesByCat.length > 0)
+          {
+            weekMap = new Map<string,WeekInfo>();
+            for(const match of matchesByCat)
+            {
+              if(match.matchDate===null || match.matchDate===undefined) continue;
+              if(match.DivisionId !== divisionId)
+              {
+                division = await this.adminService.findDivisionById(match.DivisionId);
+                divisionId=match.DivisionId;
+                if(division.MatchType === 5 ) continue;
+              }
+
+              // const date: Date = DateFNS.parse(match.matchDate);
+              const afttWeekName=match.WeekName;
+              const r: WeekInfo = weekMap.get(afttWeekName);
+              const weekNumber=DateFNS.getWeek(match.matchDate, {weekStartsOn: 1, locale: be});
+              const year=DateFNS.getYear(match.matchDate);
+              let dayOfWeek: number = DateFNS.getDay(match.matchDate);
+              if(dayOfWeek===0) dayOfWeek=7;
+
+              let startOfWeek=DateFNS.startOfWeek(match.matchDate, {weekStartsOn: 1, locale: be});
+              let endOfWeek=DateFNS.endOfWeek(match.matchDate, {weekStartsOn: 1, locale: be});
+
+              /*
+              [2020-04-06T12:45:40.619] [DEBUG] AdminApiController - 
+              match date:Fri Nov 22 2019 00:00:00 GMT+0100 (GMT+01:00), 
+              week:47, 
+              week day:5, 
+              start week:Mon Nov 18 2019 00:00:00 GMT+0100 (GMT+01:00), 
+              end week:Sun Nov 24 2019 00:00:00 GMT+0100 (GMT+01:00)
+
+              [2020-04-06T12:45:40.802] [DEBUG] AdminApiController - 
+              match date:Sun Feb 16 2020 00:00:00 GMT+0100 (GMT+01:00), 
+              week:7, 
+              week day:7, 
+              start week:Mon Feb 10 2020 00:00:00 GMT+0100 (GMT+01:00), 
+              end week:Sun Feb 16 2020 00:00:00 GMT+0100 (GMT+01:00)
+
+              */
+              const oneDayMillisec = 1000 * 24 * 60 * 60;
+              startOfWeek = new Date( match.matchDate.getTime() - (dayOfWeek-1) * oneDayMillisec);
+              endOfWeek = new Date( match.matchDate.getTime() + (7 - dayOfWeek)  * oneDayMillisec );
+              //logger.debug('Week of date '+match.matchDate+' is: '+weekNumber);
+
+              logger.debug('match date:'+match.matchDate+', week:'+weekNumber+', week day:'+dayOfWeek
+                                                    +', start week:'+startOfWeek+', end week:'+endOfWeek);
+
+              if(r===null || r===undefined)
+              {
+                weekInfo = new WeekInfo(
+                  /*public weebName: string,*/    afttWeekName,
+                  /*public weekNumber: number,*/  weekNumber,
+                  /*public year: number,*/        year,
+                  /*public startOfWeek: Date,*/   startOfWeek,
+                  /*public endOfWeek: Date,*/     endOfWeek,
+                );
+                weekMap.set(afttWeekName, /*weekNumber + 1000 * year*/ weekInfo);
+              }
+              else
+              {
+                if( r.year !== year && r.weekNumber !== weekNumber)
+                {
+                  logger.error('weekname '+afttWeekName+' is associated to more then one weekNumber: '+r+' and '+weekNumber, match);
+                  isInError=true;
+                }
+              }
+            }
+
+            logger.info('Weeks evaluation done for category '+cat.name+' - is in error ?'+isInError);
+          }
+
+          if (! isInError )
+          {
+            await this.prepareWeeksFromCategoryAndMap(cat, weekMap, syncId);
+          }
+          
+        }
+
+      }
+    }
+
+    async prepareWeeksFromCategoryAndMap(category: AfttDivisionCategoryEntity, weekMap: Map<string,WeekInfo>, syncId: number)
+    {
+      //logger.debug('create week for category', category);
+      //logger.debug('week map', weekMap);
+
+      for (const key of weekMap.keys()) {
+        const weekInfo: WeekInfo=weekMap.get(key);
+        //logger.debug('key:'+key+', WeekInfo:', weekInfo);
+        await this.adminService.createAfttWeek(syncId, category, weekInfo);
+      }
     }
 }

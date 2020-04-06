@@ -9,6 +9,7 @@ import { AfttDivisionEntity } from '../entities/aftt-division.entity';
 import { AfttMatchEntity } from '../entities/aftt-match.entity';
 import { AfttDivisionCategoryEntity } from '../entities/aftt-division-category.entity';
 import { AfttMemberByCategoryEntity } from '../entities/aftt-member-by-category.entity';
+import { AfttWeekByCategory } from '../entities/aftt-week-by-category.entity';
 const logger = log4js.getLogger('AfttRepositoryService');
 
 @Injectable()
@@ -27,6 +28,8 @@ export class AfttRepositoryService
         private readonly afttMatchRepository: BaseRepository<AfttMatchEntity>,
         @Inject('afttMemberByCategoryEntityRepositoryToken')
         private readonly afttMemberByCategoryEntityRepository: BaseRepository<AfttMemberByCategoryEntity>,
+        @Inject('afttWeekByCategoryEntityRepositoryToken')
+        private readonly afttWeekByCategoryEntityRepository: BaseRepository<AfttWeekByCategory>,
     ) {}
     
     async save(allData: AfttAllDataEntity): Promise<AfttAllDataEntity>
@@ -168,6 +171,9 @@ export class AfttRepositoryService
         await getConnection().createQueryBuilder().delete().from(AfttMemberByCategoryEntity)
                 .where('aftt_LastSyncId = :syncId', { syncId })
                 .execute();
+        await getConnection().createQueryBuilder().delete().from(AfttWeekByCategory)
+                .where('lastSyncId = :syncId', { syncId })
+                .execute();
         //await this.afttRepositoryService.removeAllAfttDataForSync(syncId);
     }
 
@@ -230,4 +236,33 @@ export class AfttRepositoryService
             .getMany();
     }
 
+    async getAfttMatches(syncId: number): Promise<AfttMatchEntity[]>
+    {
+        return this.afttMatchRepository
+            .createQueryBuilder('aftt_match')
+            .where(' aftt_match.aftt_LastSyncId = :syncId', { syncId })
+            //.andWhere(' news.id = document.newsId')
+            //.orderBy('news.showOrder')
+            //.addOrderBy('news.createdAt DESC')
+            .getMany();
+    }
+
+    async findDivisionById(divisionId: number): Promise<AfttDivisionEntity>
+    {
+        return this.afttDivisionRepository.createQueryBuilder('division')
+            .where('division.DivisionId = :divisionId', {divisionId})
+            .getOne();
+    }
+
+    async deleteAllWeeks(syncId: number)
+    {
+        await getConnection().createQueryBuilder().delete().from(AfttWeekByCategory)
+            .where('lastSyncId = :syncId', { syncId })
+            .execute();
+    }
+
+    async saveAfttWeek(week: AfttWeekByCategory): Promise<AfttWeekByCategory>
+    {
+        return this.afttWeekByCategoryEntityRepository.save(week);
+    }
 }
