@@ -10,6 +10,8 @@ import { NewsModule } from '../../modules/news/news.module';
 import { ConfigurationModule } from '../../modules/configuration/configuration.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { AdminModule } from '../../modules/admin/admin.module';
+import { ParametreApiController } from './parametre-api/parametre-api.controller';
+import { ParametreModule } from '../../modules/parametre/parametre.module';
 
 @Module({
   imports: [
@@ -22,12 +24,14 @@ import { AdminModule } from '../../modules/admin/admin.module';
     SoapModule,
     ContactModule,
     NewsModule,
+    ParametreModule,
   ],
   controllers: [
     AuthApiController,
     AdminApiController,
     ContactApiController,
     NewsApiController,
+    ParametreApiController,
   ],
   providers: [
   ],

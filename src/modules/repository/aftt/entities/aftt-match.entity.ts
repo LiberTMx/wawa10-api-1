@@ -93,4 +93,10 @@ export class AfttMatchEntity
 
     @Column({name: 'is_locked'})
     IsLocked: boolean;
+
+    @Column({name: 'homeTeamId'})
+    homeTeamId: string;
+
+    @Column({name: 'awayTeamId'})
+    awayTeamId: string;
 }

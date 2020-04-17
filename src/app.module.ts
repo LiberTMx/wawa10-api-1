@@ -12,6 +12,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { NewsModule } from './modules/news/news.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { ParametreModule } from './modules/parametre/parametre.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AdminModule } from './modules/admin/admin.module';
     ContactModule,
     NewsModule,
     AdminModule,
+    ParametreModule,
   ],
   controllers: [AppController],
   providers: [AppService],

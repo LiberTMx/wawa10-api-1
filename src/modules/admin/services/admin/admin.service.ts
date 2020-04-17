@@ -126,47 +126,47 @@ export class AdminService
 
     async saveAfttDivision(division: AfttDivisionEntity): Promise<AfttDivisionEntity>
     {
-        return this.afttRepositoryService.saveAfttDivision(division);
+        return await this.afttRepositoryService.saveAfttDivision(division);
     }
 
     async saveAfttMatch(match: AfttMatchEntity): Promise<AfttMatchEntity>
     {
-        return this.afttRepositoryService.saveAfttMatch(match);
+        return await this.afttRepositoryService.saveAfttMatch(match);
     }
 
     async getDivisionCategoryList(): Promise<AfttDivisionCategoryEntity[]>
     {
-        return this.afttRepositoryService.getDivisionCategoryList();
+        return await this.afttRepositoryService.getDivisionCategoryList();
     }
 
     async saveAfttMemberByCategory(membre: AfttMemberByCategoryEntity): Promise<AfttMemberByCategoryEntity>
     {
-        return this.afttRepositoryService.saveAfttMemberByCategory(membre);
+        return await this.afttRepositoryService.saveAfttMemberByCategory(membre);
     }
 
     async getAfttDivisions(syncId: number): Promise<AfttDivisionEntity[]>
     {
-        return this.afttRepositoryService.getAfttDivisions(syncId);
+        return await this.afttRepositoryService.getAfttDivisions(syncId);
     }
 
     async getAfttTeams(syncId: number): Promise<AfttTeamEntity[]>
     {
-      return this.afttRepositoryService.getAfttTeams(syncId);
+      return await this.afttRepositoryService.getAfttTeams(syncId);
     }
 
     async getAfttMembers(syncId: number): Promise<AfttMemberByCategoryEntity[]>
     {
-      return this.afttRepositoryService.getAfttMembers(syncId);
+      return await this.afttRepositoryService.getAfttMembers(syncId);
     }
 
     async getAfttMatches(syncId: number): Promise<AfttMatchEntity[]>
     {
-      return this.afttRepositoryService.getAfttMatches(syncId);
+      return await this.afttRepositoryService.getAfttMatches(syncId);
     }
 
     async findDivisionById(divisionId: number): Promise<AfttDivisionEntity>
     {
-        return this.afttRepositoryService.findDivisionById(divisionId);
+        return await this.afttRepositoryService.findDivisionById(divisionId);
     }
 
     async deleteAllWeeks(syncId: number)
@@ -185,6 +185,63 @@ export class AdminService
 
     async saveAfttWeek(week: AfttWeekByCategory): Promise<AfttWeekByCategory>
     {
-        return this.afttRepositoryService.saveAfttWeek(week);
+        return await this.afttRepositoryService.saveAfttWeek(week);
+    }
+
+    async getAfttWeeks(syncId: number): Promise<AfttWeekByCategory[]>
+    {
+      return await this.afttRepositoryService.getAfttWeeks(syncId);
+    }
+
+    async updateTeamsInMatchesForSync(syncId: number, clubName: string, teamNamePrefix: string, clubIndice: string)
+    {
+        const matches: AfttMatchEntity[] = await this.afttRepositoryService.getAfttMatches(syncId);
+        
+        if(matches === null || matches=== undefined || matches.length === 0 ) return;
+
+        for(const match of matches)
+        {
+            // let val: {TeamId: string} = { TeamId: null};
+
+            match.homeTeamId = null;
+            const homeTeamId = await this.afttRepositoryService.findHomeTeamIdForMatch(syncId, teamNamePrefix, match, clubIndice);
+            if ( homeTeamId !== null && homeTeamId !== undefined && Array.isArray(homeTeamId) )
+            {
+                logger.debug('teamIs IS an array, size:'+homeTeamId.length);
+                let ix=0;
+                for ( const obj of homeTeamId)
+                {   
+                    logger.debug('homeTeam['+ix+'] ', homeTeamId[ix]);
+                    ix++;
+                }
+
+                if ( homeTeamId.length > 0 )
+                {
+                    match.homeTeamId = homeTeamId[0].TeamId;
+                }
+            }
+
+            match.awayTeamId = null;
+            const awayTeamId = await this.afttRepositoryService.findAwayTeamIdForMatch(syncId, teamNamePrefix, match, clubIndice);
+            if ( awayTeamId !== null && awayTeamId !== undefined && Array.isArray(awayTeamId) )
+            {
+                logger.debug('teamIs IS an array, size:'+awayTeamId.length);
+                let ix=0;
+                for ( const obj of awayTeamId)
+                {   
+                    logger.debug('awayTeam['+ix+'] ', awayTeamId[ix]);
+                    ix++;
+                }
+
+                if ( awayTeamId.length > 0 )
+                {
+                    match.awayTeamId = awayTeamId[0].TeamId;
+                }
+            }
+            
+            const newMatch = await this.afttRepositoryService.saveAfttMatch(match);
+            logger.debug('Match after team ids assigned:', newMatch);
+        }
+        //await this.afttRepositoryService.updateTeamsInMatchesForSync(syncId, clubName, teamNamePrefix);
     }
 }

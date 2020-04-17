@@ -13,6 +13,9 @@ import { AfttMemberByCategoryEntity } from '../../../modules/repository/aftt/ent
 import { ResponseMessage } from '../../../shared/dto/response-message.dto';
 import { WeekInfo } from '../../../shared/week.info';
 import { be } from 'date-fns/locale';
+import { AfttWeekByCategory } from '../../../modules/repository/aftt/entities/aftt-week-by-category.entity';
+import { ParametreService } from '../../../modules/parametre/services/parametre.service';
+import { ParametreType } from '../../../modules/parametre/enum/parametre.enum';
 const logger = log4js.getLogger('AdminApiController');
 
 @Controller('admin')
@@ -21,6 +24,7 @@ export class AdminApiController
     constructor(
         private readonly adminService: AdminService,
         private readonly soapService: SoapService,
+        private readonly parametreService: ParametreService,
       ) 
     {}
 
@@ -137,7 +141,7 @@ export class AdminApiController
       const teams=lastSync.teams;
       const teamsAsJson=JSON.parse(teams);
       const teamsData=teamsAsJson.data;
-      this.processTeams(lastSync.id, teamsData);
+      const clubName: string = this.processTeams(lastSync.id, teamsData);
 
       // Les divisions
       const divisionsAsJson=JSON.parse(lastSync.divisions);
@@ -162,10 +166,15 @@ export class AdminApiController
 
       await this.buildAfttWeeks();
 
+      const teamNamePrefix = await this.parametreService.findParametreByKey(ParametreType.aftt_team_name_prefix);
+      const clubIndice = await this.parametreService.findParametreByKey(ParametreType.club_indice);
+
+      await this.adminService.updateTeamsInMatchesForSync(lastSync.id, clubName, teamNamePrefix.paramValue, clubIndice.paramValue);
+
       return new ResponseMessage('ok', '200');
     }
 
-    processTeams(lastSyncId: number, teamsData: any)
+    processTeams(lastSyncId: number, teamsData: any): string
     {
 
       /*
@@ -213,6 +222,7 @@ export class AdminApiController
         }
       }
 
+      return clubName;
     }
 
     processDivisions(lastSyncId: number, teams: any, divisions: any)
@@ -389,6 +399,20 @@ export class AdminApiController
     {
       const syncId = req.params.syncId;
       return this.adminService.getAfttMembers(syncId);
+    }
+
+    @Get('afttWeeks/:syncId')
+    async getAfttWeeks(@Request() req): Promise<AfttWeekByCategory[]>
+    {
+      const syncId = req.params.syncId;
+      return this.adminService.getAfttWeeks(syncId);
+    }
+
+    @Get('afttMatches/:syncId')
+    async getAfttMatches(@Request() req): Promise<AfttMatchEntity[]>
+    {
+      const syncId = req.params.syncId;
+      return this.adminService.getAfttMatches(syncId);
     }
 
     @Get('buildWeeks')

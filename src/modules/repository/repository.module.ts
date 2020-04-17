@@ -13,6 +13,8 @@ import { NewsImageRepositoryService } from './news/services/news/news-image-repo
 import { NewsDocRepositoryService } from './news/services/news/news-doc-repository.service';
 import { afttAllDataProvider, afttTeamProvider, afttDivisionProvider, afttMatchProvider, afttDivisionCategoryProvider, afttMemberByCategoryProvider, afttWeekByCategoryProvider } from './aftt/aftt.providers';
 import { AfttRepositoryService } from './aftt/services/aftt-repository.service';
+import { ParametreRepositoryService } from './parametre/services/parametre-repository.service';
+import { parametreProvider } from './parametre/parametre.providers';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { AfttRepositoryService } from './aftt/services/aftt-repository.service';
     NewsImageRepositoryService,
     NewsDocRepositoryService,
     AfttRepositoryService,
+    ParametreRepositoryService,
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
@@ -39,6 +42,8 @@ import { AfttRepositoryService } from './aftt/services/aftt-repository.service';
     NewsDocRepositoryService, ...newsDocProvider,
     AfttRepositoryService, ...afttAllDataProvider, ...afttTeamProvider, ...afttDivisionProvider, ...afttMatchProvider,
       ...afttDivisionCategoryProvider, ...afttMemberByCategoryProvider, ...afttWeekByCategoryProvider,
+
+    ParametreRepositoryService, ...parametreProvider,
   ],
 })
 export class RepositoryModule {}

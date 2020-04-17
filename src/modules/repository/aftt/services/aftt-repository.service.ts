@@ -177,16 +177,19 @@ export class AfttRepositoryService
         //await this.afttRepositoryService.removeAllAfttDataForSync(syncId);
     }
 
+    //@Transactional()
     async saveAfttTeam(team: AfttTeamEntity): Promise<AfttTeamEntity>
     {
         return this.afttTeamRepository.save(team);
     }
 
+    //@Transactional()
     async saveAfttDivision(division: AfttDivisionEntity): Promise<AfttDivisionEntity>
     {
         return this.afttDivisionRepository.save(division);
     }
 
+    //@Transactional()
     async saveAfttMatch(match: AfttMatchEntity): Promise<AfttMatchEntity>
     {
         return this.afttMatchRepository.save(match);
@@ -198,6 +201,7 @@ export class AfttRepositoryService
             .find({ order: { order: 'ASC' } });
     }
 
+    //@Transactional()
     async saveAfttMemberByCategory(membre: AfttMemberByCategoryEntity): Promise<AfttMemberByCategoryEntity>
     {
         return this.afttMemberByCategoryEntityRepository.save(membre);
@@ -265,4 +269,56 @@ export class AfttRepositoryService
     {
         return this.afttWeekByCategoryEntityRepository.save(week);
     }
+
+    async getAfttWeeks(syncId: number): Promise<AfttWeekByCategory[]>
+    {
+        return this.afttWeekByCategoryEntityRepository
+            .createQueryBuilder('aftt_week_by_category')
+            .where(' aftt_week_by_category.aftt_LastSyncId = :syncId', { syncId })
+            //.andWhere(' news.id = document.newsId')
+            //.orderBy('news.showOrder')
+            //.addOrderBy('news.createdAt DESC')
+            .getMany();
+    }
+
+    /*
+    @Transactional()
+    async updateTeamsInMatchesForSync(syncId: number, clubName: string, teamNamePrefix: string)
+    {
+        logger.info('updating matches TeamIds - still not implemented!');
+        logger.info('syncId: '+syncId+', clubName'+clubName+', teamNamePrefix:'+teamNamePrefix);
+    }
+    */
+
+    findHomeTeamIdForMatch(syncId: number, teamNamePrefix: string , match: AfttMatchEntity, clubIndice: string): Promise< any >
+    {
+        // tslint:disable
+        const sql = "select   t.TeamId  from aftt_match m " + 
+        " inner  join aftt_team t on concat( '"+teamNamePrefix+" ', t.Team ) = m.HomeTeam and t.DivisionId = m.DivisionId " +
+        " and t.aftt_LastSyncId = m.aftt_LastSyncId and t.DivisionCategory = m.DivisionCategory and m.HomeClub = '" + clubIndice + "' "+
+        " where m.aftt_LastSyncId = "+syncId+" and concat( '"+teamNamePrefix+" ' , t.Team ) = m.HomeTeam " +
+        " and m.id = " + match.id;
+
+        logger.debug('sql for home team:', sql);
+
+        const rawData = this.afttMatchRepository.query(sql);
+        return rawData;
+    }
+
+
+    findAwayTeamIdForMatch(syncId: number, teamNamePrefix: string , match: AfttMatchEntity, clubIndice: string): Promise< any >
+    {
+        // tslint:disable
+        const sql = "select   t.TeamId  from aftt_match m " + 
+        " inner  join aftt_team t on concat( '"+teamNamePrefix+" ', t.Team ) = m.AwayTeam and t.DivisionId = m.DivisionId " +
+        " and t.aftt_LastSyncId = m.aftt_LastSyncId and t.DivisionCategory = m.DivisionCategory and m.AwayClub = '" + clubIndice + "' "+
+        " where m.aftt_LastSyncId = "+syncId+" and concat( '"+teamNamePrefix+" '  , t.Team ) = m.AwayTeam " +
+        " and m.id = " + match.id;
+
+        logger.debug('sql for away team:', sql);
+
+        const rawData = this.afttMatchRepository.query(sql);
+        return rawData;
+    }
+
 }
