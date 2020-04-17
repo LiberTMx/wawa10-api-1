@@ -59,17 +59,12 @@ export class UserRepositoryService
        ` inner join auth_user_group ug on ug.group_id=g.id and ug.user_id= ${userid} ` );
     }
 
-    async findById(userID: number): Promise<AuthUserEntity> {
-        /*
-        const qb = this.authUserRepository.createQueryBuilder('authUser');
-        return qb.innerJoinAndSelect(AuthUserService.AUTHUSER_AUTHUSERGROUP, 'authUserGroup')
-        .innerJoinAndSelect(AuthUserService.AUTHUSERGROUP_AUTHGROUP, 'authGroup')
-        .innerJoinAndSelect(AuthUserService.AUTHGROUP_AUTHGROUPROLE, 'authGroupRole')
-        .innerJoinAndSelect(AuthUserService.AUTHGROUPROLE_AUTHROLENAME, 'authRoleName')
-        .where('authUser.id = :userID', {userID})
-        .getOne();
-        */
-       return null;
+    async findById(userID: number): Promise<AuthUserEntity> 
+    {
+        const user=this.userRepository.createQueryBuilder('authUser')
+            .where('authUser.id = :id', {id: userID})
+            .getOne();
+        return user;
     }
 
     async saveUser(user: AuthUserEntity): Promise<AuthUserEntity> 

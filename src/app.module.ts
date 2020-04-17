@@ -13,6 +13,8 @@ import { ContactModule } from './modules/contact/contact.module';
 import { NewsModule } from './modules/news/news.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ParametreModule } from './modules/parametre/parametre.module';
+import { StatusModule } from './modules/status/status.module';
+import { RoiModule } from './modules/roi/roi.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { ParametreModule } from './modules/parametre/parametre.module';
     NewsModule,
     AdminModule,
     ParametreModule,
+    StatusModule,
+    RoiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

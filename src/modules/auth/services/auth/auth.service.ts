@@ -229,14 +229,14 @@ export class AuthService
     }
    
     async identifyUser(requestHeaderAuthorization: string): Promise<AuthUserEntity | null> {
-        if (requestHeaderAuthorization && requestHeaderAuthorization.length > 7) {
-          const token = requestHeaderAuthorization.substring(7);
-          try {
-            return await this.jwtService.verify(token, true);
-          } catch (err) {
-            logger.error('Verify user error', JSON.stringify(err));
-          }
+        //if (requestHeaderAuthorization && requestHeaderAuthorization.length > 7) {
+        const token = requestHeaderAuthorization;//.substring(7);
+        try {
+          return await this.jwtService.verify(token, true);
+        } catch (err) {
+          logger.error('Verify user error', JSON.stringify(err));
         }
+        //}
         return null;
     }
 

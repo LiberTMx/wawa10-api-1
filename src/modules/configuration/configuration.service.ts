@@ -20,8 +20,8 @@ export class ConfigurationService {
     logger.debug('node env is:' + process.env.NODE_ENV);
     logger.debug('app env is:' + env);
 
-    let filename = 'wawa-10-database.conf';
-    if (env === 'ld') filename = 'wawa-10-database.ld.conf';
+    let filename = 'wawa-10.conf';
+    if (env === 'ld') filename = 'wawa-10.ld.conf';
 
     const filepath = cwd + '/' + filename;
     logger.debug('config file is:' + filepath);

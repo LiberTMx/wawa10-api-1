@@ -5,6 +5,9 @@ import * as os from 'os';
 import { UserRepositoryService } from '../../../repository/user/services/user-repository/user-repository.service';
 import { AuthUserEntity } from '../../../repository/user/entities/auth-user.entity';
 
+import * as log4js from 'log4js';
+const logger = log4js.getLogger('JwtService');
+
 export const JWT_CONFIG = {
   accessTokenExpires: '1h',
   refreshTokenExpires: '18h',
@@ -52,6 +55,8 @@ export class JwtService {
   async verify(token: string, isWs = false): Promise<AuthUserEntity | null> {
     try {
       const payload = jwt.verify(token, JWT_CONFIG.jwtSecret) as any;
+      logger.debug('verify access via payload', payload);
+
       const user = await this.userRepositoryService.findById(payload.sub._id);
 
       if (!user) {

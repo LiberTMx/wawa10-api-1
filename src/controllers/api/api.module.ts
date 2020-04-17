@@ -12,6 +12,8 @@ import { MulterModule } from '@nestjs/platform-express';
 import { AdminModule } from '../../modules/admin/admin.module';
 import { ParametreApiController } from './parametre-api/parametre-api.controller';
 import { ParametreModule } from '../../modules/parametre/parametre.module';
+import { StatusApiController } from './status-api/status-api.controller';
+import { RoiApiController } from './roi-api/roi-api.controller';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { ParametreModule } from '../../modules/parametre/parametre.module';
     ContactApiController,
     NewsApiController,
     ParametreApiController,
+    StatusApiController,
+    RoiApiController,
   ],
   providers: [
   ],
