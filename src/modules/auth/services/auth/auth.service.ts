@@ -23,6 +23,8 @@ import { AuthGroupRepositoryService } from '../../../repository/user/services/au
 import { AuthGroupModel } from '../../../repository/user/model/auth-group.model';
 import { MessageDTO } from '../../../../shared/dto/contact/message.dto';
 import { EmailDestinationType } from '../../../mail/types/email-destination-type.enum';
+import { AuthFonctionEntity } from '../../../repository/user/entities/auth-fonction.entity';
+import { AuthFonctionModel } from '../../../repository/user/model/auth-fonction.model';
 
 const logger = log4js.getLogger('AuthService');
 
@@ -302,5 +304,30 @@ export class AuthService
     async getUserList(readAll: boolean = false): Promise<AuthUserEntity[]>
     {
       return await this.userRepositoryService.getUserList(readAll);
+    }
+
+    async getAllUserFonction(): Promise<AuthFonctionEntity[]>
+    {
+      return await this.userRepositoryService.getAllUserFonction();
+    }
+
+    async createAuthFonction(fonction: AuthFonctionModel): Promise<AuthFonctionEntity>
+    {
+        const f= new AuthFonctionEntity();
+        f.code=fonction.code;
+        f.designation=fonction.designation;
+        f.description=fonction.description;
+        await this.saveFonction(f);
+        return await this.findFonctionByCode(f.code);
+    }
+    
+    async saveFonction(fonction: AuthFonctionEntity): Promise<AuthFonctionEntity> 
+    {
+        return this.userRepositoryService.saveFonction(fonction);
+    }
+
+    async findFonctionByCode(code: string): Promise<AuthFonctionEntity> 
+    {
+        return this.userRepositoryService.findFonctionByCode(code);
     }
 }

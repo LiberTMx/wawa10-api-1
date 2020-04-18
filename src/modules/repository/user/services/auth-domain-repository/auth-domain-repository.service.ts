@@ -5,6 +5,8 @@ import { BaseRepository } from 'typeorm-transactional-cls-hooked';
 import * as log4js from 'log4js';
 import { AuthDomainEntity } from '../../entities/auth-domain.entity';
 import { AuthDomainModel } from '../../model/auth-domain.model';
+import { AuthFonctionModel } from '../../model/auth-fonction.model';
+import { AuthFonctionEntity } from '../../entities/auth-fonction.entity';
 const logger = log4js.getLogger('AuthDomainRepositoryService');
 
 @Injectable()
@@ -43,5 +45,5 @@ export class AuthDomainRepositoryService
         await this.saveDomain(domain);
         return await this.findDomainName(domain.domain);
     }
-    
+
 }

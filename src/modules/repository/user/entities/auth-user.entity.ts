@@ -101,4 +101,7 @@ export class AuthUserEntity
     @Column({name: 'password'})
     password: string;
 
+    @Column({name: 'membre_comite'})
+    membreComite: boolean;
+
 }

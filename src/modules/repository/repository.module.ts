@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserRepositoryService } from './user/services/user-repository/user-repository.service';
-import { userProvider, userRoleProvider, authDomainProvider, authGroupProvider } from './user/user.providers';
+import { userProvider, userRoleProvider, authDomainProvider, authGroupProvider, authFonctionProvider } from './user/user.providers';
 import { DatabaseModule } from '../database/database.module';
 import { credentialProvider } from './credential/credential.providers';
 import { CredentialRepositoryService } from './credential/services/credential-repository.service';
@@ -11,7 +11,8 @@ import { newsProvider, newsImageProvider, newsDocProvider } from './news/news.pr
 import { ConfigurationModule } from '../configuration/configuration.module';
 import { NewsImageRepositoryService } from './news/services/news/news-image-repository.service';
 import { NewsDocRepositoryService } from './news/services/news/news-doc-repository.service';
-import { afttAllDataProvider, afttTeamProvider, afttDivisionProvider, afttMatchProvider, afttDivisionCategoryProvider, afttMemberByCategoryProvider, afttWeekByCategoryProvider } from './aftt/aftt.providers';
+import { afttAllDataProvider, afttTeamProvider, afttDivisionProvider, afttMatchProvider, 
+  afttDivisionCategoryProvider, afttMemberByCategoryProvider, afttWeekByCategoryProvider } from './aftt/aftt.providers';
 import { AfttRepositoryService } from './aftt/services/aftt-repository.service';
 import { ParametreRepositoryService } from './parametre/services/parametre-repository.service';
 import { parametreProvider } from './parametre/parametre.providers';
@@ -34,7 +35,7 @@ import { parametreProvider } from './parametre/parametre.providers';
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
-    UserRepositoryService, ...userProvider, ...userRoleProvider, 
+    UserRepositoryService, ...userProvider, ...userRoleProvider, ...authFonctionProvider,
     AuthDomainRepositoryService, ...authDomainProvider, 
     AuthGroupRepositoryService, ...authGroupProvider, 
     NewsRepositoryService,...newsProvider,

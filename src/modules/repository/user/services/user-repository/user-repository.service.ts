@@ -1,9 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { AuthUserEntity } from '../../entities/auth-user.entity';
 import { BaseRepository } from 'typeorm-transactional-cls-hooked';
+import { AuthRoleEntity } from '../../entities/auth-role.entity';
 
 import * as log4js from 'log4js';
-import { AuthRoleEntity } from '../../entities/auth-role.entity';
+import { AuthFonctionEntity } from '../../entities/auth-fonction.entity';
 const logger = log4js.getLogger('UserRepositoryService');
 
 @Injectable()
@@ -15,6 +16,9 @@ export class UserRepositoryService
 
         @Inject('AuthRoleRepositoryToken')
         private readonly userRoleRepository: BaseRepository<AuthRoleEntity>,
+
+        @Inject('AuthFonctionRepositoryToken')
+        private readonly userFonctionRepository: BaseRepository<AuthFonctionEntity>, 
     ) {}
     
     async findByUserName(username: string): Promise<AuthUserEntity> {
@@ -93,4 +97,26 @@ export class UserRepositoryService
             .addOrderBy('authUser.prenom', 'ASC')
             .getMany();
     } 
+
+    async getAllUserFonction(): Promise<AuthFonctionEntity[]>
+    {
+        return this.userFonctionRepository
+            .createQueryBuilder('authUserFonction')
+            .orderBy('authUserFonction.code', 'ASC')
+            .getMany();
+    } 
+
+    async saveFonction(fonction: AuthFonctionEntity): Promise<AuthFonctionEntity> 
+    {
+        return this.userFonctionRepository.save(fonction);
+    }
+
+    async findFonctionByCode(code: string): Promise<AuthFonctionEntity> 
+    {
+        const fonction=this.userFonctionRepository.createQueryBuilder('authUserFonction')
+            .where('authUserFonction.code = :code', {code})
+            .getOne();
+        return fonction;
+    }
+    
 }

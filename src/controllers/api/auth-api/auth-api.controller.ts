@@ -7,6 +7,8 @@ import { AuthUserEntity } from '../../../modules/repository/user/entities/auth-u
 import { validateSync } from 'class-validator';
 import { AuthDomainModel } from '../../../modules/repository/user/model/auth-domain.model';
 import { AuthGroupModel } from '../../../modules/repository/user/model/auth-group.model';
+import { AuthFonctionEntity } from '../../../modules/repository/user/entities/auth-fonction.entity';
+import { AuthFonctionModel } from '../../../modules/repository/user/model/auth-fonction.model';
 const logger = log4js.getLogger('AuthApiController');
 
 @Controller('auth')
@@ -143,4 +145,36 @@ export class AuthApiController
       }
       return users;
   }
+
+  @Get('fonctions')
+  async getAllUserFonction(): Promise<AuthFonctionEntity[]>
+  {
+    return await this.authService.getAllUserFonction();    
+  }
+
+  @Post('createFonction')
+  async createFonction(@Body() fonction: AuthFonctionModel): Promise<AuthFonctionEntity>
+  {
+    logger.debug('Creating a new fonction:', fonction);
+
+    const validationErrors = validateSync(fonction, { validationError: { target: false } });
+    if (validationErrors !== null && validationErrors.length > 0) 
+    {
+      throw new BadRequestException(validationErrors);
+    }
+    return await this.authService.createAuthFonction(fonction);
+  }
+
+  @Post('updateFonction')
+  async updateFonction(): Promise<AuthFonctionEntity>
+  {
+    throw new BadRequestException('Still NOT implemented !');
+  }
+
+  @Post('deleteFonction/:id')
+  async deleteFonction(): Promise<AuthFonctionEntity>
+  {
+    throw new BadRequestException('Still NOT implemented !');
+  } 
+
 }

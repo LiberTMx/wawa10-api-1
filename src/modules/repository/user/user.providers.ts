@@ -3,6 +3,7 @@ import { AuthUserEntity } from './entities/auth-user.entity';
 import { AuthRoleEntity } from './entities/auth-role.entity';
 import { AuthDomainEntity } from './entities/auth-domain.entity';
 import { AuthGroupEntity } from './entities/auth-group.entity';
+import { AuthFonctionEntity } from './entities/auth-fonction.entity';
 
 export const userProvider = [
   {
@@ -36,3 +37,11 @@ export const authGroupProvider = [
   },
 ];
 
+// AuthFonctionEntity
+export const authFonctionProvider = [
+  {
+    provide: 'AuthFonctionRepositoryToken',
+    useFactory: (connection: Connection) => connection.getRepository(AuthFonctionEntity),
+    inject: ['DbConnectionToken'],
+  },
+]; 
