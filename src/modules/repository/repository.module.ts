@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserRepositoryService } from './user/services/user-repository/user-repository.service';
-import { userProvider, userRoleProvider, authDomainProvider, authGroupProvider, authFonctionProvider } from './user/user.providers';
+import { userProvider, userRoleProvider, authDomainProvider, authGroupProvider, authFonctionProvider, authGroupRoleProvider } from './user/user.providers';
 import { DatabaseModule } from '../database/database.module';
 import { credentialProvider } from './credential/credential.providers';
 import { CredentialRepositoryService } from './credential/services/credential-repository.service';
@@ -16,6 +16,8 @@ import { afttAllDataProvider, afttTeamProvider, afttDivisionProvider, afttMatchP
 import { AfttRepositoryService } from './aftt/services/aftt-repository.service';
 import { ParametreRepositoryService } from './parametre/services/parametre-repository.service';
 import { parametreProvider } from './parametre/parametre.providers';
+import { AuthRoleRepositoryService } from './user/services/auth-role-repository/auth-role-repository/auth-role-repository.service';
+import { AuthGroupRoleRepositoryService } from './user/services/auth-group-role-repository/auth-group-role-repository.service';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { parametreProvider } from './parametre/parametre.providers';
     UserRepositoryService,
     AuthDomainRepositoryService,
     AuthGroupRepositoryService,
+    AuthRoleRepositoryService,
+    AuthGroupRoleRepositoryService,
     NewsRepositoryService,
     NewsImageRepositoryService,
     NewsDocRepositoryService,
@@ -35,16 +39,20 @@ import { parametreProvider } from './parametre/parametre.providers';
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
-    UserRepositoryService, ...userProvider, ...userRoleProvider, ...authFonctionProvider,
+    UserRepositoryService, ...userProvider, ...authFonctionProvider,
+    AuthRoleRepositoryService, ...userRoleProvider,
     AuthDomainRepositoryService, ...authDomainProvider, 
     AuthGroupRepositoryService, ...authGroupProvider, 
+    AuthGroupRoleRepositoryService, ...authGroupRoleProvider,
+
     NewsRepositoryService,...newsProvider,
     NewsImageRepositoryService, ...newsImageProvider,
     NewsDocRepositoryService, ...newsDocProvider,
     AfttRepositoryService, ...afttAllDataProvider, ...afttTeamProvider, ...afttDivisionProvider, ...afttMatchProvider,
       ...afttDivisionCategoryProvider, ...afttMemberByCategoryProvider, ...afttWeekByCategoryProvider,
 
-    ParametreRepositoryService, ...parametreProvider,
+    ParametreRepositoryService, ...parametreProvider, 
+
   ],
 })
 export class RepositoryModule {}

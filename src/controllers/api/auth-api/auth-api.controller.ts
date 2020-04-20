@@ -9,6 +9,9 @@ import { AuthDomainModel } from '../../../modules/repository/user/model/auth-dom
 import { AuthGroupModel } from '../../../modules/repository/user/model/auth-group.model';
 import { AuthFonctionEntity } from '../../../modules/repository/user/entities/auth-fonction.entity';
 import { AuthFonctionModel } from '../../../modules/repository/user/model/auth-fonction.model';
+import { AuthDomainEntity } from '../../../modules/repository/user/entities/auth-domain.entity';
+import { AuthRoleEntity } from '../../../modules/repository/user/entities/auth-role.entity';
+import { AuthGroupRoleEntity } from '../../../modules/repository/user/entities/auth-group-role.entity';
 const logger = log4js.getLogger('AuthApiController');
 
 @Controller('auth')
@@ -91,9 +94,15 @@ export class AuthApiController
   }
 
   @Get('domainList')
-  async getAllAuthDomains(@Request() req)
+  async getAllAuthDomains(@Request() req): Promise<AuthDomainEntity[]>
   {
     return await this.authService.getAllAuthDomains();
+  }
+
+  @Get('roleList')
+  async getAllAuthRoles(@Request() req): Promise<AuthRoleEntity[]>
+  {
+    return await this.authService.getAllAuthRoles();
   }
 
   @Post('domainCreate')
@@ -113,6 +122,12 @@ export class AuthApiController
   async getAllAuthGroups(@Request() req)
   {
     return await this.authService.getAllAuthGroups();
+  }
+
+  @Get('groupRoleList')
+  async getAllAuthGroupRoles(@Request() req): Promise<AuthGroupRoleEntity[]>
+  {
+    return await this.authService.getAllAuthGroupRoles();
   }
 
   @Post('groupCreate')

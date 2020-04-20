@@ -8,14 +8,14 @@ export class AuthGroupRoleEntity {
     @PrimaryColumn()
     id: number;
 
-    @Column({name: 'auth_group_id'})
+    @Column({name: 'group_id'})
     authGroupId: number;
 
-    @Column({name: 'auth_role_id'})
+    @Column({name: 'role_id'})
     authRoleId: number;
 
     @ManyToOne(type => AuthGroupEntity, authGroupEntity => authGroupEntity.authGroupRole)
-    @JoinColumn({name: 'auth_group_id'})
+    @JoinColumn({name: 'group_id'})
     authGroup: AuthGroupEntity;
 
     /*
@@ -25,7 +25,7 @@ export class AuthGroupRoleEntity {
     */
 
     @OneToOne(type => AuthRoleEntity)
-    @JoinColumn({name: 'auth_role_id'})
+    @JoinColumn({name: 'role_id'})
     authRoleName: AuthRoleEntity;
 
 }

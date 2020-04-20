@@ -11,4 +11,7 @@ export class AuthDomainEntity {
 
     @Column()
     commentaire: string;
+
+    @Column({name: 'show_ordre'})
+    showOrdre: number;
 }

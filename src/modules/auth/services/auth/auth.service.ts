@@ -25,6 +25,9 @@ import { MessageDTO } from '../../../../shared/dto/contact/message.dto';
 import { EmailDestinationType } from '../../../mail/types/email-destination-type.enum';
 import { AuthFonctionEntity } from '../../../repository/user/entities/auth-fonction.entity';
 import { AuthFonctionModel } from '../../../repository/user/model/auth-fonction.model';
+import { AuthRoleRepositoryService } from '../../../repository/user/services/auth-role-repository/auth-role-repository/auth-role-repository.service';
+import { AuthGroupRoleRepositoryService } from '../../../repository/user/services/auth-group-role-repository/auth-group-role-repository.service';
+import { AuthGroupRoleEntity } from '../../../repository/user/entities/auth-group-role.entity';
 
 const logger = log4js.getLogger('AuthService');
 
@@ -38,6 +41,8 @@ export class AuthService
         private readonly userRepositoryService: UserRepositoryService,
         private readonly authDomainRepositoryService: AuthDomainRepositoryService,
         private readonly authGroupRepositoryService: AuthGroupRepositoryService,
+        private readonly authGroupRoleRepositoryService: AuthGroupRoleRepositoryService,
+        private readonly authRoleRepositoryService: AuthRoleRepositoryService,
         private readonly credentialRepositoryService: CredentialRepositoryService,
     ) {}
 
@@ -284,6 +289,16 @@ export class AuthService
     async getAllAuthDomains(): Promise<AuthDomainEntity[]>
     {
       return await this.authDomainRepositoryService.getAllAuthDomains();
+    }
+
+    async getAllAuthRoles(): Promise<AuthRoleEntity[]>
+    {
+      return await this.authRoleRepositoryService.getAllAuthRoles();
+    }
+
+    async getAllAuthGroupRoles(): Promise<AuthGroupRoleEntity[]>
+    {
+      return await this.authGroupRoleRepositoryService.getAllAuthGroupRoles();
     }
 
     async createAuthDomain(authDomainModel: AuthDomainModel): Promise<AuthDomainEntity>

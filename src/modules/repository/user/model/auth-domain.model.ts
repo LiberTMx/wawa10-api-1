@@ -1,4 +1,4 @@
-import { MinLength } from 'class-validator';
+import { MinLength, IsInt, IsNotEmpty } from 'class-validator';
 
 export class AuthDomainModel
 {
@@ -7,4 +7,8 @@ export class AuthDomainModel
     domainName: string;
 
     domainCommentaire: string;
+
+    @IsInt()
+    @IsNotEmpty()
+    showOrdre: number;
 }
