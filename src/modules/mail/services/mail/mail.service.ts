@@ -257,6 +257,8 @@ export class MailService
             '<br/> '+
             '<h3>Origine</h3>'+
             '<p>Nom: '+message.name+'</p>'+
+            '<h3>Adresse email</h3>'+
+            '<p>Email: '+message.email+'</p>'+
             '<br/> '+
             '</body> '+
             '</html> ';
