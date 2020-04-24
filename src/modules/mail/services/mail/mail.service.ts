@@ -219,7 +219,7 @@ export class MailService
             from: 'CTT Limal-Wavre <ctt.limal.wavre.site2@gmail.com>',
             to: mailTo,
             subject: messageDTO.subject,
-            html: messageDTO.message,
+            html: this.buildMessageAsHtml(messageDTO),
         };
         
         transporter.sendMail(mailOptions, (error, info) => {
@@ -231,6 +231,35 @@ export class MailService
         });
 
         //transporter.close();
+    }
+
+    buildMessageAsHtml(message: MessageDTO): string
+    {
+        switch(message.destinationType)
+        {
+            case EmailDestinationType.TO_CLUB:
+                return this.buildMessageAsHtmlForClub(message);
+            default: 
+                return message.message;
+        }
+    }
+
+    buildMessageAsHtmlForClub(message: MessageDTO): string
+    {
+        return '<html> '+
+            '<head> '+
+            '   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> '+
+            '   <title>CTT Limal-Wavre - Message Externe</title> '+
+            '</head> '+
+            '<body> '+
+            '<h3>Message</h3>'+
+            message.message +
+            '<br/> '+
+            '<h3>Origine</h3>'+
+            '<p>Nom: '+message.name+'</p>'+
+            '<br/> '+
+            '</body> '+
+            '</html> ';
     }
 
     /*
