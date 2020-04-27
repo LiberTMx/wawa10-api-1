@@ -11,6 +11,8 @@ import { AfttDivisionCategoryEntity } from '../../../repository/aftt/entities/af
 import { AfttMemberByCategoryEntity } from '../../../repository/aftt/entities/aftt-member-by-category.entity';
 import { AfttWeekByCategory } from '../../../repository/aftt/entities/aftt-week-by-category.entity';
 import { WeekInfo } from '../../../../shared/week.info';
+import { InterclubsRepositoryService } from '../../../repository/interclubs/services/interclubs-repository.service';
+import { InterclubsCategoryEntity } from '../../../repository/interclubs/entities/interclub-category.entity';
 const logger = log4js.getLogger('AdminService');
 
 @Injectable()
@@ -18,6 +20,7 @@ export class AdminService
 {
     constructor(
         private readonly afttRepositoryService: AfttRepositoryService,
+        private readonly interclubsRepositoryService: InterclubsRepositoryService,
     ) {}
 
     async createAfttAllData(teams: string, divisions: string, matches: string, membres: string): Promise<AfttAllDataEntity>
@@ -243,5 +246,17 @@ export class AdminService
             logger.debug('Match after team ids assigned:', newMatch);
         }
         //await this.afttRepositoryService.updateTeamsInMatchesForSync(syncId, clubName, teamNamePrefix);
+    }
+
+    async importInterclubsCategoriesFromAfttToClub()
+    {
+        const categories: InterclubsCategoryEntity[]=await this.afttRepositoryService.getDivisionCategoryList();
+        if(categories!==null && categories!==undefined)
+        {
+            for(const cat of categories)
+            {
+                
+            }
+        }
     }
 }

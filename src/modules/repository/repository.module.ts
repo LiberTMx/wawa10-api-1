@@ -18,6 +18,8 @@ import { ParametreRepositoryService } from './parametre/services/parametre-repos
 import { parametreProvider } from './parametre/parametre.providers';
 import { AuthRoleRepositoryService } from './user/services/auth-role-repository/auth-role-repository/auth-role-repository.service';
 import { AuthGroupRoleRepositoryService } from './user/services/auth-group-role-repository/auth-group-role-repository.service';
+import { InterclubsRepositoryService } from './interclubs/services/interclubs-repository.service';
+import { interclubsSemaineProvider, interclubscategoryProvider } from './interclubs/interclubs.providers';
 
 @Module({
   imports: [
@@ -36,6 +38,7 @@ import { AuthGroupRoleRepositoryService } from './user/services/auth-group-role-
     NewsDocRepositoryService,
     AfttRepositoryService,
     ParametreRepositoryService,
+    InterclubsRepositoryService,
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
@@ -53,6 +56,7 @@ import { AuthGroupRoleRepositoryService } from './user/services/auth-group-role-
 
     ParametreRepositoryService, ...parametreProvider, 
 
+    InterclubsRepositoryService, ...interclubsSemaineProvider, ...interclubscategoryProvider,
   ],
 })
 export class RepositoryModule {}

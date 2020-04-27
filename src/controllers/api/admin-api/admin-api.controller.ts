@@ -571,4 +571,18 @@ export class AdminApiController
         await this.adminService.createAfttWeek(syncId, category, weekInfo);
       }
     }
+
+    @Get('importSemainesFromAfttToClub')
+    async importSemainesFromAfttToClub(): Promise<ResponseMessage>
+    {
+      logger.warn('Still NOT implemented!');
+      return new ResponseMessage('ok', '200');
+    }
+
+    @Get('importInterclubsCategoriesFromAfttToClub')
+    async importInterclubsCategoriesFromAfttToClub(): Promise<ResponseMessage>
+    {
+      await this.adminService.importInterclubsCategoriesFromAfttToClub();
+      return new ResponseMessage('ok', '200');
+    }
 }
