@@ -36,7 +36,7 @@ export class InterclubsRepositoryService
         return this.interclubsSemaineRepository.find();
     }
 
-    async getInterclubsCategory(): Promise< InterclubsCategoryEntity[] >
+    async getInterclubsCategories(): Promise< InterclubsCategoryEntity[] >
     {
         return this.interclubsCategoryRepository.find();
     }

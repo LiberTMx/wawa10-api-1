@@ -11,16 +11,16 @@ export class InterclubsApiController {
         ) {}
         
     // http://server/api/interclubs/listeSemainesInterclubs/dames
-    @Get('listeSemainesInterclubs/:type')
+    @Get('listeInterclubsSemaines/:type')
     async getInterclubsSemaineByInterclubType(@Request() req): Promise< InterclubsSemaineEntity[] >
     {
         const interclubType= req.params.type;
         return this.interclubsService.getInterclubsSemaineByInterclubType(interclubType);
     }
 
-    @Get('listeCategoryInterclubs')
-    async getCategoryInterclubs(@Request() req): Promise< InterclubsCategoryEntity[] >
+    @Get('listeInterclubsCategories')
+    async getInterclubsCategories(@Request() req): Promise< InterclubsCategoryEntity[] >
     {
-        return this.interclubsService.getInterclubsCategory();
+        return this.interclubsService.getInterclubsCategories();
     }
 }

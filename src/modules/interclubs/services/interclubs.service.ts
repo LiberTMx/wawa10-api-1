@@ -23,13 +23,13 @@ export class InterclubsService
     }
     */
 
-    async getInterclubsSemaineByInterclubType(interclubsType: InterclubsType) : Promise< InterclubsSemaineEntity[] >
+    async getInterclubsSemaineByInterclubType(interclubsType: InterclubsType): Promise< InterclubsSemaineEntity[] >
     {
         return this.interclubsRepositoryService.getInterclubsSemaineByInterclubType(interclubsType);
     }
 
-    async getInterclubsCategory() : Promise< InterclubsCategoryEntity[] >
+    async getInterclubsCategories(): Promise< InterclubsCategoryEntity[] >
     {
-        return this.interclubsRepositoryService.getInterclubsCategory();
+        return this.interclubsRepositoryService.getInterclubsCategories();
     }
 }
