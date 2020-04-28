@@ -582,7 +582,7 @@ export class AdminApiController
     @Get('importInterclubsCategoriesFromAfttToClub')
     async importInterclubsCategoriesFromAfttToClub(): Promise<ResponseMessage>
     {
-      await this.adminService.importInterclubsCategoriesFromAfttToClub();
-      return new ResponseMessage('ok', '200');
+      return await this.adminService.importInterclubsCategoriesFromAfttToClub();
+      // return new ResponseMessage('ok', '200');
     }
 }

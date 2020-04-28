@@ -13,6 +13,7 @@ import { AfttWeekByCategory } from '../../../repository/aftt/entities/aftt-week-
 import { WeekInfo } from '../../../../shared/week.info';
 import { InterclubsRepositoryService } from '../../../repository/interclubs/services/interclubs-repository.service';
 import { InterclubsCategoryEntity } from '../../../repository/interclubs/entities/interclub-category.entity';
+import { ResponseMessage } from '../../../../shared/dto/response-message.dto';
 const logger = log4js.getLogger('AdminService');
 
 @Injectable()
@@ -248,15 +249,61 @@ export class AdminService
         //await this.afttRepositoryService.updateTeamsInMatchesForSync(syncId, clubName, teamNamePrefix);
     }
 
-    async importInterclubsCategoriesFromAfttToClub()
+    async importInterclubsCategoriesFromAfttToClub(): Promise<ResponseMessage>
     {
-        const categories: InterclubsCategoryEntity[]=await this.afttRepositoryService.getDivisionCategoryList();
-        if(categories!==null && categories!==undefined)
+        // Il faut avoir les infos sur le last sync id !
+        // const lastSyncID = await this.getLastAfttSync(); >> Pas nécessaire, c'est une table de réference, indépendante de syncId !
+
+        const response = new ResponseMessage('ok', '200');
+
+        const afttCategories: AfttDivisionCategoryEntity[]=await this.afttRepositoryService.getDivisionCategoryList();
+
+        if(afttCategories!==null && afttCategories!==undefined)
         {
-            for(const cat of categories)
+            for(const afttCat of afttCategories)
             {
-                
+                let clubCat = await this.interclubsRepositoryService.getInterclubCategoryByPlayerCategory(afttCat.playercategory);
+                if(clubCat===null || clubCat===undefined)
+                {
+                    // Ok on crae une nouvelle entité
+                    const newClubCat = new InterclubsCategoryEntity();
+                    //Object.assign(newClubCat, afttCat); >> Not working here !
+                    newClubCat.name=afttCat.name;
+                    newClubCat.classementCategory=afttCat.classementcategory;
+                    newClubCat.playerCategory=afttCat.playercategory;
+                    newClubCat.divisionNamePrefix=afttCat.division_name_prefix;
+                    newClubCat.firstSeason=afttCat.first_season;
+                    newClubCat.lastSeason=afttCat.last_season;
+                    newClubCat.order=afttCat.order;
+                    clubCat = await this.interclubsRepositoryService.saveInterclubCategory(newClubCat);
+                    response.message += ', Created cat \' '+clubCat.name + '\'';
+                }
+                else
+                {
+                    // En principe rien à faire sauf si le libellé a changé !!!
+                    if(clubCat.name !== afttCat.name )
+                    {
+                        response.message += ', update cat name from \' ' + clubCat.name + '\' to \' ' + afttCat.name + '\'';
+                        clubCat.name = afttCat.name;
+                        clubCat.classementCategory=afttCat.classementcategory;
+                        clubCat.divisionNamePrefix=afttCat.division_name_prefix;
+                        clubCat.firstSeason=afttCat.first_season;
+                        clubCat.lastSeason=afttCat.last_season;
+                        clubCat.order=afttCat.order;
+                        clubCat = await this.interclubsRepositoryService.saveInterclubCategory(clubCat);
+                    }
+                    else
+                    {
+                        response.message += ', cat \' ' + clubCat.name + '\' is uptodate';
+                    }
+                }
             }
         }
+        else
+        {
+            response.message='ok, but no data found in AFTT reference table !';
+        }
+
+        return response;
     }
 }
