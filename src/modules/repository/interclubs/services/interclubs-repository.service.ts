@@ -36,8 +36,20 @@ export class InterclubsRepositoryService
         return this.interclubsSemaineRepository.find();
     }
 
-    async getInterclubsCategory(): Promise< InterclubsCategoryEntity[] >
+    async getInterclubsCategories(): Promise< InterclubsCategoryEntity[] >
     {
         return this.interclubsCategoryRepository.find();
+    }
+
+    async getInterclubCategoryByPlayerCategory(playerCategory: number): Promise<InterclubsCategoryEntity>
+    {
+        return this.interclubsCategoryRepository.createQueryBuilder('interclubsCategory')
+            .where('interclubsCategory.playerCategory = :cat', {cat: playerCategory})
+            .getOne();
+    }
+
+    async saveInterclubCategory(newClubCat: InterclubsCategoryEntity): Promise<InterclubsCategoryEntity>
+    {
+        return this.interclubsCategoryRepository.save(newClubCat);
     }
 }
