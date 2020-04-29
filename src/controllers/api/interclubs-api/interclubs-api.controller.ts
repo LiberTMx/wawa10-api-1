@@ -1,7 +1,9 @@
 import { Controller, Get, Request } from '@nestjs/common';
 import { InterclubsSemaineEntity } from 'src/modules/repository/interclubs/entities/interclubs-semaine.entity';
 import { InterclubsService } from 'src/modules/interclubs/services/interclubs.service';
-import { InterclubsCategoryEntity } from 'src/modules/repository/interclubs/entities/interclub-category.entity';
+import { InterclubsCategoryEntity } from 'src/modules/repository/interclubs/entities/interclubs-category.entity';
+import { InterclubsDivisionEntity } from '../../../modules/repository/interclubs/entities/interclubs-division.entity';
+import { InterclubsTeamEntity } from '../../../modules/repository/interclubs/entities/interclubs-team.entity';
 
 @Controller('interclubs')
 export class InterclubsApiController {
@@ -23,4 +25,17 @@ export class InterclubsApiController {
     {
         return this.interclubsService.getInterclubsCategories();
     }
+
+    @Get('listeInterclubsDivisions')
+    async getInterclubsDivisions(@Request() req): Promise< InterclubsDivisionEntity[] >
+    {
+        return this.interclubsService.getInterclubsDivisions();
+    }
+
+    @Get('listeInterclubsTeams')
+    async getInterclubsTeams(@Request() req): Promise< InterclubsTeamEntity[] >
+    {
+        return this.interclubsService.getInterclubsTeams();
+    }
+
 }

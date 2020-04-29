@@ -12,8 +12,16 @@ import { AfttMemberByCategoryEntity } from '../../../repository/aftt/entities/af
 import { AfttWeekByCategory } from '../../../repository/aftt/entities/aftt-week-by-category.entity';
 import { WeekInfo } from '../../../../shared/week.info';
 import { InterclubsRepositoryService } from '../../../repository/interclubs/services/interclubs-repository.service';
-import { InterclubsCategoryEntity } from '../../../repository/interclubs/entities/interclub-category.entity';
+import { InterclubsCategoryEntity } from '../../../repository/interclubs/entities/interclubs-category.entity';
 import { ResponseMessage } from '../../../../shared/dto/response-message.dto';
+import { InterclubsSemaineEntity } from '../../../repository/interclubs/entities/interclubs-semaine.entity';
+import { AfttMatchTypeEntity } from '../../../repository/aftt/entities/aftt-match-type.entity';
+import { InterclubsDivisionEntity } from '../../../repository/interclubs/entities/interclubs-division.entity';
+import { InterclubsTeamEntity } from '../../../repository/interclubs/entities/interclubs-team.entity';
+import { InterclubsMatchEntity } from '../../../repository/interclubs/entities/interclubs-match.entity';
+import { InterclubsLdfParticipantEntity } from '../../../repository/interclubs/entities/interclubs-ldf-participant.entity';
+import { AuthService } from '../../../auth/services/auth/auth.service';
+import { InterclubsLdfByCategoryEntity } from '../../../repository/interclubs/entities/interclubs-ldf-by-category.entity';
 const logger = log4js.getLogger('AdminService');
 
 @Injectable()
@@ -21,6 +29,7 @@ export class AdminService
 {
     constructor(
         private readonly afttRepositoryService: AfttRepositoryService,
+        private readonly authService: AuthService,
         private readonly interclubsRepositoryService: InterclubsRepositoryService,
     ) {}
 
@@ -302,6 +311,241 @@ export class AdminService
         else
         {
             response.message='ok, but no data found in AFTT reference table !';
+        }
+
+        return response;
+    }
+
+    async importInterclubsSemainesFromAfttToClub(): Promise<ResponseMessage>
+    {
+        const response = new ResponseMessage('ok', '200');
+
+        const lastSync =  await this.getLastAfttSyncId();
+        const afttSemaines: AfttWeekByCategory[]=await this.afttRepositoryService.getAfttWeeks(lastSync.id);
+
+        if(afttSemaines!==null && afttSemaines!==undefined)
+        {
+            for(const afttSem of afttSemaines)
+            {
+                let clubSem = await this.interclubsRepositoryService.findInterclubSemaineByCategoryAndWeekNumber(afttSem.divisionCategoryId, afttSem.weekNumber, afttSem.year);
+                if(clubSem===null || clubSem===undefined)
+                {
+                    // Ok on crae une nouvelle entité
+                    const newClubSem = new InterclubsSemaineEntity();
+                    //Object.assign(newClubCat, afttCat); >> Not working here !
+                    newClubSem.afftDivisionCategoryId=afttSem.divisionCategoryId;
+                    newClubSem.weekName=afttSem.weekName;
+                    newClubSem.weekNumber=afttSem.weekNumber;
+                    newClubSem.year=afttSem.year;
+                    newClubSem.startOfWeek=afttSem.startOfWeek;
+                    newClubSem.endOfWeek=afttSem.endOfWeek;
+                    clubSem = await this.interclubsRepositoryService.saveInterclubSemaine(newClubSem);
+                    response.message += ', Created sem \' '+newClubSem.weekName + '\'';
+                }
+                else
+                {
+                    // En principe rien à faire sauf si le libellé a changé !!!
+                    if(clubSem.startOfWeek !== afttSem.startOfWeek || clubSem.endOfWeek !== afttSem.endOfWeek)
+                    {
+                        response.message += ', update cat name from ' + clubSem.startOfWeek +', '+ clubSem.endOfWeek
+                        + ' to ' + afttSem.startOfWeek + ', '+ afttSem.endOfWeek;
+                        clubSem.startOfWeek=afttSem.startOfWeek;
+                        clubSem.endOfWeek=afttSem.endOfWeek;
+                        clubSem = await this.interclubsRepositoryService.saveInterclubSemaine(clubSem);
+                    }
+                    else
+                    {
+                        response.message += ', cat \' ' + clubSem.weekName + '\' is uptodate';
+                    }
+                }
+            }
+        }
+        else
+        {
+            response.message='ok, but no data found in AFTT reference table !';
+        }
+
+        return response;
+    }
+
+    async getMatchTypes(): Promise< AfttMatchTypeEntity[] >
+    {
+        return this.afttRepositoryService.getMatchTypes();
+    }
+
+    async importInterclubsDivisionsFromAfttToClub(): Promise<ResponseMessage>
+    {
+        const response = new ResponseMessage('ok', '200');
+
+        const lastSync =  await this.getLastAfttSyncId();
+        const matchTypes: AfttMatchTypeEntity[] = await this.getMatchTypes();
+
+        const afttDivisions: AfttDivisionEntity[] = await this.getAfttDivisions(lastSync.id);
+
+        if(afttDivisions !== null && afttDivisions !== undefined)
+        {
+            let matchType: AfttMatchTypeEntity=null;
+
+            for(const afttDiv of afttDivisions)
+            {
+                matchType=matchTypes.find( t => t.matchType === afttDiv.MatchType);
+                if(matchType && matchType.supportedByClub === false )
+                {
+                    logger.warn('skipping division - match type not supported !', afttDiv);
+                    continue;
+                }
+
+                let clubDiv: InterclubsDivisionEntity = await this.interclubsRepositoryService.findInterclubsDivisionByAfttDivisionId(afttDiv.DivisionId);
+
+                if(clubDiv===null || clubDiv===undefined)
+                {
+                    const newClubDiv=new InterclubsDivisionEntity();
+                    newClubDiv.DivisionCategory=afttDiv.DivisionCategory;
+                    newClubDiv.DivisionId=afttDiv.DivisionId;
+                    newClubDiv.DivisionName=afttDiv.DivisionName;
+                    newClubDiv.Level=afttDiv.Level;
+                    newClubDiv.MatchType=afttDiv.MatchType;
+                    clubDiv=await this.interclubsRepositoryService.saveInterclubsDivision(newClubDiv);
+                }
+                else
+                {
+                    // do nothing ?
+                }
+            }
+        }
+
+        return response;
+    }
+
+    async importInterclubsTeamsFromAfttToClub(): Promise<ResponseMessage>
+    {
+        const response = new ResponseMessage('ok', '200');
+
+        const lastSync =  await this.getLastAfttSyncId();
+        const matchTypes: AfttMatchTypeEntity[] = await this.getMatchTypes();
+
+        const afttTeams: AfttTeamEntity[] = await this.getAfttTeams(lastSync.id);
+
+        if(afttTeams !== null && afttTeams !== undefined)
+        {
+            let matchType: AfttMatchTypeEntity=null;
+
+            for(const afttTeam of afttTeams)
+            {
+                matchType=matchTypes.find( t => t.matchType === afttTeam.MatchType);
+                if(matchType && matchType.supportedByClub === false )
+                {
+                    logger.warn('skipping team - match type not supported !', afttTeam);
+                    continue;
+                }
+
+                let clubTeam: InterclubsTeamEntity = await this.interclubsRepositoryService.findInterclubsTeamByAfttTeamId(afttTeam.TeamId);
+
+                if(clubTeam===null || clubTeam===undefined)
+                {
+                    const newClubTeam=new InterclubsTeamEntity();
+                    newClubTeam.TeamId=afttTeam.TeamId;
+                    newClubTeam.Team=afttTeam.Team;
+                    newClubTeam.DivisionId=afttTeam.DivisionId;
+                    newClubTeam.DivisionName=afttTeam.DivisionName;
+                    newClubTeam.DivisionCategory=afttTeam.DivisionCategory;
+                    newClubTeam.MatchType=afttTeam.MatchType;
+                    clubTeam=await this.interclubsRepositoryService.saveInterclubsTeam(newClubTeam);
+                }
+                else
+                {
+                    // do nothing ?
+                }
+            }
+        }
+        return response;
+    }
+
+    async importInterclubsMatchesFromAfttToClub(): Promise<ResponseMessage>
+    {
+        const response = new ResponseMessage('ok', '200');
+
+        const lastSync =  await this.getLastAfttSyncId();
+
+        const clubTeams: InterclubsTeamEntity[] = await this.interclubsRepositoryService.getInterclubsTeams();
+        if(clubTeams!==null && clubTeams!==undefined)
+        {
+            for(const clubTeam of clubTeams)
+            {
+                const afttMatchesForClubTeam: AfttMatchEntity[] = await this.afttRepositoryService.findAfttMatchesForClubTeam(clubTeam, lastSync.id);
+
+                if(afttMatchesForClubTeam!==null && afttMatchesForClubTeam!==undefined)
+                {
+                    for(const afttMatch of afttMatchesForClubTeam)
+                    {
+                        let clubMatch: InterclubsMatchEntity = await this.interclubsRepositoryService.findInterclubsMatchByMatchId(afttMatch);
+                        if(clubMatch===null || clubMatch===undefined)
+                        {
+                            const newClubMatch = new InterclubsMatchEntity();
+                            Object.assign(newClubMatch, afttMatch);
+                            // Attention ! Ne pas utilisrla valeur de l'id de afttMatch !
+                            newClubMatch.id=undefined;
+                            clubMatch=await this.interclubsRepositoryService.saveInterclubMatch(newClubMatch);
+                        }
+
+                    }
+                }
+            }
+        }
+
+        return response;
+    }
+
+    async importInterclubsAllLDFFromAfttToClub(): Promise<ResponseMessage>
+    {
+        const response = new ResponseMessage('ok', '200');
+
+        const lastSync =  await this.getLastAfttSyncId();
+
+        const afttMembres: AfttMemberByCategoryEntity[] = await this.getAfttMembers(lastSync.id);
+
+        if(afttMembres!==null && afttMembres!==undefined)
+        {
+            for(const afttMembre of afttMembres)
+            {
+                const licence = String(afttMembre.UniqueIndex);
+                let ldfParticipant: InterclubsLdfParticipantEntity=await this.interclubsRepositoryService
+                                                                .findInterclubsLdfParticipantByLicence( licence );
+
+                if(ldfParticipant===null || ldfParticipant===undefined)
+                {
+                    const user = await this.authService.findUserByLicence(licence);
+
+                    // participant not foound: on crée tout
+                    const newParticipant=new InterclubsLdfParticipantEntity();
+                    newParticipant.nom=afttMembre.LastName;
+                    newParticipant.prenom=afttMembre.FirstName;
+                    newParticipant.sexe=afttMembre.Gender;
+                    newParticipant.licence= licence;
+                    newParticipant.authUserId=(user!==null && user!==undefined)?user.id : null;
+                    newParticipant.statut=afttMembre.Status;
+                    newParticipant.playerCategory=String(afttMembre.divisionCategory);
+                    newParticipant.medicalAttestation=afttMembre.MedicalAttestation;
+
+                    await this.interclubsRepositoryService.saveInterclubsLdfParticipant(newParticipant);
+                    ldfParticipant=await this.interclubsRepositoryService.findInterclubsLdfParticipantByLicence( licence );
+                }
+
+                // recherche ldfCategory pour ce participant et cette categorie
+                let ldfCategory: InterclubsLdfByCategoryEntity
+                    =await this.interclubsRepositoryService.findInterclubsLdfByCategory( ldfParticipant.id, afttMembre.divisionCategory);
+                
+                if(ldfCategory===null || ldfCategory===undefined)
+                {
+                    const newLdfCategory=new InterclubsLdfByCategoryEntity();
+                    newLdfCategory.participantId=ldfParticipant.id;
+                    newLdfCategory.playerCategory=afttMembre.divisionCategory;
+                    newLdfCategory.position=afttMembre.Position;
+                    newLdfCategory.classement=afttMembre.Ranking;
+                    newLdfCategory.rankingIndex=afttMembre.RankingIndex;
+                    ldfCategory=await this.interclubsRepositoryService.InterclubsLdfByCategoryEntity(newLdfCategory);
+                }
+            }
         }
 
         return response;

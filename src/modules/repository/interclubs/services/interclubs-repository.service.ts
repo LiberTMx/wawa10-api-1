@@ -2,7 +2,13 @@ import { Injectable, Inject } from '@nestjs/common';
 import { BaseRepository } from 'typeorm-transactional-cls-hooked';
 import { InterclubsType } from '../../../interclubs/enum/interclubs.enum';
 import { InterclubsSemaineEntity } from '../entities/interclubs-semaine.entity';
-import { InterclubsCategoryEntity } from '../entities/interclub-category.entity';
+import { InterclubsDivisionEntity } from '../entities/interclubs-division.entity';
+import { InterclubsTeamEntity } from '../entities/interclubs-team.entity';
+import { InterclubsCategoryEntity } from '../entities/interclubs-category.entity';
+import { InterclubsMatchEntity } from '../entities/interclubs-match.entity';
+import { AfttMatchEntity } from '../../aftt/entities/aftt-match.entity';
+import { InterclubsLdfParticipantEntity } from '../entities/interclubs-ldf-participant.entity';
+import { InterclubsLdfByCategoryEntity } from '../entities/interclubs-ldf-by-category.entity';
 
 @Injectable()
 export class InterclubsRepositoryService 
@@ -14,6 +20,18 @@ export class InterclubsRepositoryService
         private readonly interclubsSemaineRepository: BaseRepository<InterclubsSemaineEntity>,
         @Inject('interclubsCategoryRepositoryToken')
         private readonly interclubsCategoryRepository: BaseRepository<InterclubsCategoryEntity>,
+        @Inject('interclubsDivisionRepositoryToken')
+        private readonly interclubsDivisionRepository: BaseRepository<InterclubsDivisionEntity>,
+        @Inject('interclubsTeamRepositoryToken')
+        private readonly interclubsTeamRepository: BaseRepository<InterclubsTeamEntity>,
+        @Inject('interclubsMatchRepositoryToken')
+        private readonly interclubsMatchRepository: BaseRepository<InterclubsMatchEntity>,
+
+        @Inject('interclubsLdfParticipantRepositoryToken')
+        private readonly interclubsLdfParticipantRepository: BaseRepository<InterclubsLdfParticipantEntity>,
+        @Inject('interclubsLdfByCategoryRepositoryToken')
+        private readonly interclubsLdfByCategoryRepository: BaseRepository<InterclubsLdfByCategoryEntity>,
+
     ) {}
 
 /*     async getAllinterclubss(): Promise< interclubsEntity[] >
@@ -51,5 +69,90 @@ export class InterclubsRepositoryService
     async saveInterclubCategory(newClubCat: InterclubsCategoryEntity): Promise<InterclubsCategoryEntity>
     {
         return this.interclubsCategoryRepository.save(newClubCat);
+    }
+
+    async findInterclubSemaineByCategoryAndWeekNumber(categoryId: number, weekNumber: number, year: number): Promise<InterclubsSemaineEntity>
+    {
+        return this.interclubsSemaineRepository.createQueryBuilder('semaine')
+            .where('semaine.afftDivisionCategoryId = :cat', { cat: categoryId})
+            .andWhere('semaine.weekNumber = :wn ', { wn: weekNumber})
+            .andWhere('semaine.year = :year ', { year })
+            .getOne();
+    }
+
+    async saveInterclubSemaine(semaine: InterclubsSemaineEntity): Promise<InterclubsSemaineEntity>
+    {
+        return this.interclubsSemaineRepository.save(semaine);
+    }
+
+    async findInterclubsDivisionByAfttDivisionId(afttDivisionId: number): Promise<InterclubsDivisionEntity>
+    {
+        return this.interclubsDivisionRepository.createQueryBuilder('division')
+            .where('division.DivisionId = :divId', { divId: afttDivisionId})
+            .getOne();
+    }
+
+    async saveInterclubsDivision(division: InterclubsDivisionEntity): Promise<InterclubsDivisionEntity>
+    {
+        return this.interclubsDivisionRepository.save(division);
+    }
+
+    async findInterclubsTeamByAfttTeamId(teamId: string): Promise<InterclubsTeamEntity>
+    {
+        return this.interclubsTeamRepository.createQueryBuilder('team')
+            .where('team.TeamId = :teamId', { teamId })
+            .getOne();
+    }
+
+    async saveInterclubsTeam(team: InterclubsTeamEntity): Promise<InterclubsTeamEntity>
+    {
+        return this.interclubsTeamRepository.save(team);
+    }
+
+    async getInterclubsDivisions(): Promise< InterclubsDivisionEntity[] >
+    {
+        return this.interclubsDivisionRepository.find();
+    }
+
+    async getInterclubsTeams(): Promise< InterclubsTeamEntity[] >
+    {
+        return this.interclubsTeamRepository.find();
+    }
+
+    async findInterclubsMatchByMatchId(afttMatch: AfttMatchEntity): Promise<InterclubsMatchEntity>
+    {
+        return this.interclubsMatchRepository.createQueryBuilder('match')
+            .where('match.MatchId = :matchId', { matchId: afttMatch.MatchId })
+            .getOne();
+    }
+
+    async saveInterclubMatch(match: InterclubsMatchEntity): Promise<InterclubsMatchEntity>
+    {
+        return this.interclubsMatchRepository.save(match);
+    }
+
+    async findInterclubsLdfParticipantByLicence(licence: string): Promise<InterclubsLdfParticipantEntity>
+    {
+        return this.interclubsLdfParticipantRepository.createQueryBuilder('participant')
+            .where('participant.licence = :licence', { licence })
+            .getOne();
+    }
+
+    async findInterclubsLdfByCategory(participantId: number, playerCategory: number): Promise<InterclubsLdfByCategoryEntity>
+    {
+        return this.interclubsLdfByCategoryRepository.createQueryBuilder('ldf')
+            .where('ldf.participantId = :participantId', { participantId })
+            .andWhere('ldf.playerCategory = :playerCategory', { playerCategory })
+            .getOne();
+    }
+
+    async saveInterclubsLdfParticipant(participant: InterclubsLdfParticipantEntity): Promise<InterclubsLdfParticipantEntity>
+    {
+        return this.interclubsLdfParticipantRepository.save(participant);
+    }
+
+    async InterclubsLdfByCategoryEntity(ldfCategory: InterclubsLdfByCategoryEntity): Promise<InterclubsLdfByCategoryEntity>
+    {
+        return this.interclubsLdfByCategoryRepository.save(ldfCategory);
     }
 }

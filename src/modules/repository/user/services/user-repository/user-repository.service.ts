@@ -119,4 +119,11 @@ export class UserRepositoryService
         return fonction;
     }
     
+    async findUserByLicence(licence: string): Promise<AuthUserEntity>
+    {
+        const user=this.userRepository.createQueryBuilder('authUser')
+            .where('authUser.licence = :licence', { licence })
+            .getOne();
+        return user;
+    }
 }

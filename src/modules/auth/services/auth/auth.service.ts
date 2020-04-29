@@ -345,4 +345,9 @@ export class AuthService
     {
         return this.userRepositoryService.findFonctionByCode(code);
     }
+
+    async findUserByLicence(licence: string): Promise<AuthUserEntity>
+    {
+      return this.userRepositoryService.findUserByLicence(licence);
+    }
 }

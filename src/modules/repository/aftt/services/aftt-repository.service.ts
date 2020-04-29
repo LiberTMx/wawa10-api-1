@@ -10,6 +10,8 @@ import { AfttMatchEntity } from '../entities/aftt-match.entity';
 import { AfttDivisionCategoryEntity } from '../entities/aftt-division-category.entity';
 import { AfttMemberByCategoryEntity } from '../entities/aftt-member-by-category.entity';
 import { AfttWeekByCategory } from '../entities/aftt-week-by-category.entity';
+import { AfttMatchTypeEntity } from '../entities/aftt-match-type.entity';
+import { InterclubsTeamEntity } from '../../interclubs/entities/interclubs-team.entity';
 const logger = log4js.getLogger('AfttRepositoryService');
 
 @Injectable()
@@ -30,6 +32,8 @@ export class AfttRepositoryService
         private readonly afttMemberByCategoryEntityRepository: BaseRepository<AfttMemberByCategoryEntity>,
         @Inject('afttWeekByCategoryEntityRepositoryToken')
         private readonly afttWeekByCategoryEntityRepository: BaseRepository<AfttWeekByCategory>,
+        @Inject('afttMatchTypeEntityRepositoryToken')
+        private readonly afttMatchTypeEntityRepository: BaseRepository<AfttMatchTypeEntity>,
     ) {}
     
     async save(allData: AfttAllDataEntity): Promise<AfttAllDataEntity>
@@ -321,4 +325,26 @@ export class AfttRepositoryService
         return rawData;
     }
 
+    getMatchTypes(): Promise< AfttMatchTypeEntity[] >
+    {
+        return this.afttMatchTypeEntityRepository
+            .createQueryBuilder('aftt_match_type')
+            //.where(' aftt_division.aftt_LastSyncId = :syncId', { syncId })
+            //.andWhere(' news.id = document.newsId')
+            .orderBy('aftt_match_type.match_type')
+            //.addOrderBy('news.createdAt DESC')
+            .getMany();
+    }
+
+    findAfttMatchesForClubTeam(clubTeam: InterclubsTeamEntity, syncId: number ): Promise< AfttMatchEntity[] >
+    {
+        return this.afttMatchRepository
+            .createQueryBuilder('aftt_match')
+            .where(' aftt_match.aftt_LastSyncId = :syncId', { syncId })
+            .andWhere(' aftt_match.homeTeamId = :homeTeamId', { homeTeamId: clubTeam.TeamId })
+            .orWhere(' aftt_match.awayTeamId = :awayTeamId', { awayTeamId: clubTeam.TeamId })
+            //.orderBy('news.showOrder')
+            //.addOrderBy('news.createdAt DESC')
+            .getMany();
+    }
 }
