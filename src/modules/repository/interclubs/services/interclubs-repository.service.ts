@@ -155,4 +155,19 @@ export class InterclubsRepositoryService
     {
         return this.interclubsLdfByCategoryRepository.save(ldfCategory);
     }
+
+    async getInterclubsMatches(): Promise< InterclubsMatchEntity[] >
+    {
+        return this.interclubsMatchRepository.find();
+    }
+
+    async getInterclubsLDFParticipants(): Promise< InterclubsLdfParticipantEntity[] >
+    {
+        return this.interclubsLdfParticipantRepository.find();
+    }
+
+    async getInterclubsLDFByCategory(): Promise< InterclubsLdfByCategoryEntity[] >
+    {
+        return this.interclubsLdfByCategoryRepository.find();
+    }
 }

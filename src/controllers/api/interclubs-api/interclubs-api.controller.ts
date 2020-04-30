@@ -4,6 +4,9 @@ import { InterclubsService } from 'src/modules/interclubs/services/interclubs.se
 import { InterclubsCategoryEntity } from 'src/modules/repository/interclubs/entities/interclubs-category.entity';
 import { InterclubsDivisionEntity } from '../../../modules/repository/interclubs/entities/interclubs-division.entity';
 import { InterclubsTeamEntity } from '../../../modules/repository/interclubs/entities/interclubs-team.entity';
+import { InterclubsMatchEntity } from '../../../modules/repository/interclubs/entities/interclubs-match.entity';
+import { InterclubsLdfParticipantEntity } from '../../../modules/repository/interclubs/entities/interclubs-ldf-participant.entity';
+import { InterclubsLdfByCategoryEntity } from '../../../modules/repository/interclubs/entities/interclubs-ldf-by-category.entity';
 
 @Controller('interclubs')
 export class InterclubsApiController {
@@ -36,6 +39,24 @@ export class InterclubsApiController {
     async getInterclubsTeams(@Request() req): Promise< InterclubsTeamEntity[] >
     {
         return this.interclubsService.getInterclubsTeams();
+    }
+
+    @Get('listeInterclubsMatches')
+    async getInterclubsMatches(@Request() req): Promise< InterclubsMatchEntity[] >
+    {
+        return this.interclubsService.getInterclubsMatches();
+    }
+
+    @Get('LDFParticipants')
+    async getInterclubsLDFParticipants(@Request() req): Promise< InterclubsLdfParticipantEntity[] >
+    {
+        return this.interclubsService.getInterclubsLDFParticipants();
+    }
+
+    @Get('LDFByCategory')
+    async getInterclubsLDFByCategory(@Request() req): Promise< InterclubsLdfByCategoryEntity[] >
+    {
+        return this.interclubsService.getInterclubsLDFByCategory();
     }
 
 }
