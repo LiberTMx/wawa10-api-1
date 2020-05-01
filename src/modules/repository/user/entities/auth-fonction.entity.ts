@@ -14,4 +14,14 @@ export class AuthFonctionEntity
 
   @Column()
   description: string;
+
+  @Column({name: 'membre_comite'})
+  membreComite: boolean;
+
+  @Column()
+  deletable: boolean;
+
+  @Column({name: 'ordre_affichage'})
+  ordreAffichage: number;
+
 } 

@@ -332,6 +332,9 @@ export class AuthService
         f.code=fonction.code;
         f.designation=fonction.designation;
         f.description=fonction.description;
+        f.deletable=fonction.deletable;
+        f.membreComite=fonction.membreComite;
+        f.ordreAffichage=fonction.ordreAffichage;
         await this.saveFonction(f);
         return await this.findFonctionByCode(f.code);
     }
