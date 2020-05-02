@@ -40,6 +40,7 @@ export class AuthApiController
     return this.authService.refreshToken(body.refreshToken);
   }
 
+  /*
   @Post('/createUser')
   async createUser(@Body() createUserDTO: CreateUserDTO, @Headers() headers): Promise<AuthUserEntity> {
     const user: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
@@ -53,34 +54,16 @@ export class AuthApiController
       throw new BadRequestException('User data validation error(s): ' + validationErrors);
     }
 
-    // check group
-    /*
-    const group: AuthGroupEntity = await this.authUserService.findGroup(createUserDTO.group);
-    if (!group) {
-      throw new BadRequestException('User data validation: invalid group');
-    }
-
-    if (group.name === 'Editor' && group.name !== user.authUserGroup.authGroup.name) {
-      throw new BadRequestException('Unauthorized - you must be an editor to create editor users !');
-    }
-    */
-
     const u: AuthUserEntity = await this.authService.existsUsername(createUserDTO.username);
     if (u) {
       throw new BadRequestException('User data validation: username already exists');
     }
 
-    /*
-    u = await this.authUserService.existsEmail(createUserDTO.email);
-    if (u) {
-      throw new BadRequestException('User data validation: email already exists');
-    }
-    */
-
     const newUser: AuthUserEntity = await this.authService.createUser(createUserDTO);
     // await this.authService.addUserGroup(newUser, group);
     return newUser;
   }
+  */
 
   @Post('changePassword')
   async changePassword(@Request() req): Promise<any> 
@@ -144,7 +127,7 @@ export class AuthApiController
   }
 
   @Get('liste')
-  async getNewsList(@Query() query): Promise<AuthUserEntity[]>
+  async getUserList(@Query() query): Promise<AuthUserEntity[]>
   {
       const readAll = query.readAll;
       const all: boolean = (readAll!==null && readAll!==undefined && (readAll==='1' || readAll==='true') );
@@ -192,4 +175,26 @@ export class AuthApiController
     throw new BadRequestException('Still NOT implemented !');
   } 
 
+  @Post('createUser')
+  async createUser(@Request() req, @Headers() headers): Promise<AuthUserEntity>
+  {
+    const user: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    if (user === null) {
+      throw new BadRequestException('Unauthorized access');
+    }
+    logger.debug('Current user is:', user.username);
+    const body=req.body;
+    logger.debug('Create a user', body.userFormValue );
+    logger.debug('Create a user', body.assignedFonctions );
+    logger.debug('Create a user', body.assignedRoles );
+    //throw new BadRequestException('Still NOT implemented !');
+    try
+    {
+      return await this.authService.createUserByForm(body.userFormValue, body.assignedFonctions, body.assignedRoles);
+    }
+    catch(err)
+    {
+      throw new BadRequestException(err.message);
+    }
+  }
 }

@@ -28,6 +28,8 @@ import { AuthFonctionModel } from '../../../repository/user/model/auth-fonction.
 import { AuthRoleRepositoryService } from '../../../repository/user/services/auth-role-repository/auth-role-repository/auth-role-repository.service';
 import { AuthGroupRoleRepositoryService } from '../../../repository/user/services/auth-group-role-repository/auth-group-role-repository.service';
 import { AuthGroupRoleEntity } from '../../../repository/user/entities/auth-group-role.entity';
+import { AuthUserFonctionEntity } from '../../../repository/user/entities/auth-user-fonction.entity';
+import { AuthUserGroupEntity } from '../../../repository/user/entities/auth-user-group.entity';
 
 const logger = log4js.getLogger('AuthService');
 
@@ -332,6 +334,9 @@ export class AuthService
         f.code=fonction.code;
         f.designation=fonction.designation;
         f.description=fonction.description;
+        f.deletable=fonction.deletable;
+        f.membreComite=fonction.membreComite;
+        f.ordreAffichage=fonction.ordreAffichage;
         await this.saveFonction(f);
         return await this.findFonctionByCode(f.code);
     }
@@ -344,5 +349,97 @@ export class AuthService
     async findFonctionByCode(code: string): Promise<AuthFonctionEntity> 
     {
         return this.userRepositoryService.findFonctionByCode(code);
+    }
+
+    async findUserByLicence(licence: string): Promise<AuthUserEntity>
+    {
+      return this.userRepositoryService.findUserByLicence(licence);
+    }
+
+    async createUserByForm(userFormValue: any, assignedFonctions: string, assignedRoles: string): Promise<AuthUserEntity>
+    {
+      const u = new AuthUserEntity();
+      u.nom=userFormValue.nom;
+      u.prenom=userFormValue.prenom;
+      u.username=userFormValue.username;
+      u.email=userFormValue.email;
+
+      const dateString = '20180715';
+      // 16/09/1962
+      const year = +dateString.substr(6, 4);
+      const month = (+dateString.substr(3, 2) ) - 1;
+      const day = +dateString.substr(0, 2);
+      const dateNaissance = new Date(year, month, day);
+
+      u.dateNaissance=dateNaissance;
+      u.gestionParentale=userFormValue.gestionParentale;
+
+      u.rue=userFormValue.rue;
+      u.numero=userFormValue.numero;
+      u.boite=userFormValue.boitre;
+      u.codePostal=userFormValue.codePostal;
+      u.localite=userFormValue.localite;
+
+      u.numTel=userFormValue.tel;
+      u.numTelPrive=userFormValue.telPrive;
+      u.numMobile=userFormValue.gsm;
+      u.sexe=userFormValue.sexe;
+      u.licence=userFormValue.licence;
+      u.classementMessieur=userFormValue.classementH;
+      u.classementDame=userFormValue.classementD;
+      u.comment=userFormValue.comment;
+      u.commentComite=userFormValue.commentComite;
+      u.isStageParticipantDiscret= userFormValue.isStageParticipantDiscret;
+
+      // password par defaut: newLiwaUserPwd
+      u.password='6fd65094fbfce71dd68b619ad8cbbacf7d08c7d9f6d9b33468e59134b5288f00';
+      u.mustChangePassword=true;
+      u.membreComite=false;
+      const now: Date=new Date();
+      u.createdAt=now;
+      u.updateddAt=now;
+
+      // Les fonctions
+      let isMembreComite=false;
+      const fonctions: AuthFonctionEntity[] = JSON.parse(assignedFonctions);
+      if(fonctions!==null && fonctions!==undefined && fonctions.length>0)
+      {
+        for(const f of fonctions)
+        {
+          if(f.membreComite===true)
+          {
+            isMembreComite=true;
+            break;
+          }
+        }
+      }
+      u.membreComite=isMembreComite;
+      const user = await this.userRepositoryService.saveUser(u);
+      
+      if(fonctions!==null && fonctions!==undefined && fonctions.length>0)
+      {
+        for(const f of fonctions)
+        {
+          const auf = new AuthUserFonctionEntity();
+          auf.authUserID=user.id;
+          auf.fonctionID=f.id;
+          await this.userRepositoryService.saveAuthUserFonction(auf);
+        }
+      }
+
+      // Les groupes de roles
+      const groups: AuthGroupEntity[]=JSON.parse(assignedRoles);
+      if(groups!==null && groups!==undefined && groups.length>0)
+      {
+        for(const g of groups)
+        {
+          const ug = new AuthUserGroupEntity();
+          ug.authUserId=user.id;
+          ug.authGroupId=g.id;
+          await this.userRepositoryService.saveAuthUserGroup(ug);
+        }
+      }
+
+      return user;
     }
 }

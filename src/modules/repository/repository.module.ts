@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserRepositoryService } from './user/services/user-repository/user-repository.service';
-import { userProvider, userRoleProvider, authDomainProvider, authGroupProvider, authFonctionProvider, authGroupRoleProvider } from './user/user.providers';
+import { userProvider, userRoleProvider, authDomainProvider, authGroupProvider, authFonctionProvider, authGroupRoleProvider, authUserFonctionProvider, authUserGroupProvider } from './user/user.providers';
 import { DatabaseModule } from '../database/database.module';
 import { credentialProvider } from './credential/credential.providers';
 import { CredentialRepositoryService } from './credential/services/credential-repository.service';
@@ -12,14 +12,14 @@ import { ConfigurationModule } from '../configuration/configuration.module';
 import { NewsImageRepositoryService } from './news/services/news/news-image-repository.service';
 import { NewsDocRepositoryService } from './news/services/news/news-doc-repository.service';
 import { afttAllDataProvider, afttTeamProvider, afttDivisionProvider, afttMatchProvider, 
-  afttDivisionCategoryProvider, afttMemberByCategoryProvider, afttWeekByCategoryProvider } from './aftt/aftt.providers';
+  afttDivisionCategoryProvider, afttMemberByCategoryProvider, afttWeekByCategoryProvider, afttMatchTypeProvider } from './aftt/aftt.providers';
 import { AfttRepositoryService } from './aftt/services/aftt-repository.service';
 import { ParametreRepositoryService } from './parametre/services/parametre-repository.service';
 import { parametreProvider } from './parametre/parametre.providers';
 import { AuthRoleRepositoryService } from './user/services/auth-role-repository/auth-role-repository/auth-role-repository.service';
 import { AuthGroupRoleRepositoryService } from './user/services/auth-group-role-repository/auth-group-role-repository.service';
 import { InterclubsRepositoryService } from './interclubs/services/interclubs-repository.service';
-import { interclubsSemaineProvider, interclubscategoryProvider } from './interclubs/interclubs.providers';
+import { interclubsSemaineProvider, interclubsCategoryProvider, interclubsDivisionProvider, interclubsTeamProvider, interclubsMatchProvider, interclubsLdfParticipantProvider, interclubsLdfByCategoryProvider } from './interclubs/interclubs.providers';
 
 @Module({
   imports: [
@@ -42,7 +42,7 @@ import { interclubsSemaineProvider, interclubscategoryProvider } from './intercl
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
-    UserRepositoryService, ...userProvider, ...authFonctionProvider,
+    UserRepositoryService, ...userProvider, ...authFonctionProvider, ...authUserFonctionProvider, ...authUserGroupProvider,
     AuthRoleRepositoryService, ...userRoleProvider,
     AuthDomainRepositoryService, ...authDomainProvider, 
     AuthGroupRepositoryService, ...authGroupProvider, 
@@ -52,11 +52,13 @@ import { interclubsSemaineProvider, interclubscategoryProvider } from './intercl
     NewsImageRepositoryService, ...newsImageProvider,
     NewsDocRepositoryService, ...newsDocProvider,
     AfttRepositoryService, ...afttAllDataProvider, ...afttTeamProvider, ...afttDivisionProvider, ...afttMatchProvider,
-      ...afttDivisionCategoryProvider, ...afttMemberByCategoryProvider, ...afttWeekByCategoryProvider,
+      ...afttDivisionCategoryProvider, ...afttMemberByCategoryProvider, ...afttWeekByCategoryProvider, ...afttMatchTypeProvider,
 
     ParametreRepositoryService, ...parametreProvider, 
 
-    InterclubsRepositoryService, ...interclubsSemaineProvider, ...interclubscategoryProvider,
+    InterclubsRepositoryService, ...interclubsSemaineProvider, ...interclubsCategoryProvider, 
+      ...interclubsDivisionProvider, ...interclubsTeamProvider, ...interclubsMatchProvider,
+      ...interclubsLdfParticipantProvider, ...interclubsLdfByCategoryProvider,
   ],
 })
 export class RepositoryModule {}

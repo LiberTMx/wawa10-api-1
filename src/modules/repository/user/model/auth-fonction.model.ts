@@ -13,4 +13,9 @@ export class AuthFonctionModel
     designation: string;
     
     description: string;
+
+    membreComite: boolean;
+    deletable: boolean;
+    ordreAffichage: number;
+
 }

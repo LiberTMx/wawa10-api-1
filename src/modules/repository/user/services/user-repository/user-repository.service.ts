@@ -5,6 +5,8 @@ import { AuthRoleEntity } from '../../entities/auth-role.entity';
 
 import * as log4js from 'log4js';
 import { AuthFonctionEntity } from '../../entities/auth-fonction.entity';
+import { AuthUserFonctionEntity } from '../../entities/auth-user-fonction.entity';
+import { AuthUserGroupEntity } from '../../entities/auth-user-group.entity';
 const logger = log4js.getLogger('UserRepositoryService');
 
 @Injectable()
@@ -19,6 +21,12 @@ export class UserRepositoryService
 
         @Inject('AuthFonctionRepositoryToken')
         private readonly userFonctionRepository: BaseRepository<AuthFonctionEntity>, 
+
+        @Inject('AuthUserFonctionRepositoryToken')
+        private readonly authUserFonctionRepository: BaseRepository<AuthUserFonctionEntity>, 
+
+        @Inject('AuthUserGroupRepositoryToken')
+        private readonly authUserGroupRepository: BaseRepository<AuthUserGroupEntity>, 
     ) {}
     
     async findByUserName(username: string): Promise<AuthUserEntity> {
@@ -119,4 +127,21 @@ export class UserRepositoryService
         return fonction;
     }
     
+    async findUserByLicence(licence: string): Promise<AuthUserEntity>
+    {
+        const user=this.userRepository.createQueryBuilder('authUser')
+            .where('authUser.licence = :licence', { licence })
+            .getOne();
+        return user;
+    }
+
+    async saveAuthUserFonction(auf: AuthUserFonctionEntity): Promise<AuthUserFonctionEntity>
+    {
+        return this.authUserFonctionRepository.save(auf);
+    }
+
+    async saveAuthUserGroup(aug: AuthUserGroupEntity): Promise<AuthUserGroupEntity>
+    {
+        return this.authUserGroupRepository.save(aug);
+    }
 }

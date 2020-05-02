@@ -104,4 +104,12 @@ export class AuthUserEntity
     @Column({name: 'membre_comite'})
     membreComite: boolean;
 
+    @Column({ name: 'gestion_parentale'})
+    gestionParentale: boolean;
+
+    @Column({name: 'comment_comite'})
+    commentComite: string;
+
+    @Column({name: 'is_stage_participant_discret'})
+    isStageParticipantDiscret: boolean;
 }

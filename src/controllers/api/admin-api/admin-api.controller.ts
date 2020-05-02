@@ -16,6 +16,7 @@ import { be } from 'date-fns/locale';
 import { AfttWeekByCategory } from '../../../modules/repository/aftt/entities/aftt-week-by-category.entity';
 import { ParametreService } from '../../../modules/parametre/services/parametre.service';
 import { ParametreType } from '../../../modules/parametre/enum/parametre.enum';
+import { AfttMatchTypeEntity } from '../../../modules/repository/aftt/entities/aftt-match-type.entity';
 const logger = log4js.getLogger('AdminApiController');
 
 @Controller('admin')
@@ -583,6 +584,41 @@ export class AdminApiController
     async importInterclubsCategoriesFromAfttToClub(): Promise<ResponseMessage>
     {
       return await this.adminService.importInterclubsCategoriesFromAfttToClub();
-      // return new ResponseMessage('ok', '200');
+    }
+
+    @Get('importInterclubsSemainesAfttToClub')
+    async importInterclubsSemainesAfttToClub(): Promise<ResponseMessage>
+    {
+      return await this.adminService.importInterclubsSemainesFromAfttToClub();
+    }
+
+    @Get('matchTypes')
+    async getMatchTypes(): Promise< AfttMatchTypeEntity[] >
+    {
+        return await this.adminService.getMatchTypes();
+    }
+
+    @Get('importInterclubsDivisionsFromAfttToClub')
+    async importInterclubsDivisionsFromAfttToClub(): Promise<ResponseMessage>
+    {
+      return await this.adminService.importInterclubsDivisionsFromAfttToClub();
+    }
+
+    @Get('importInterclubsTeamsFromAfttToClub')
+    async importInterclubsTeamsFromAfttToClub(): Promise<ResponseMessage>
+    {
+      return await this.adminService.importInterclubsTeamsFromAfttToClub();
+    }
+
+    @Get('importInterclubsMatchesFromAfttToClub')
+    async importInterclubsMatchesFromAfttToClub(): Promise<ResponseMessage>
+    {
+      return await this.adminService.importInterclubsMatchesFromAfttToClub();
+    }
+
+    @Get('importInterclubsAllLDFFromAfttToClub')
+    async importInterclubsAllLDFFromAfttToClub(): Promise<ResponseMessage>
+    {
+      return await this.adminService.importInterclubsAllLDFFromAfttToClub();
     }
 }
