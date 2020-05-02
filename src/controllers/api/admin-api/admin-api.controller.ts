@@ -115,9 +115,16 @@ export class AdminApiController
     @Get('lastAfttSyncId')
     async getLastAfttSyncId(): Promise<AfttAllDataEntity>
     {
-      const lastSyncId =  await this.adminService.getLastAfttSyncId();
-      logger.debug('lastSync ID:', lastSyncId);
-      return lastSyncId;
+      try
+      {
+        const lastSyncId =  await this.adminService.getLastAfttSyncId();
+        logger.debug('lastSync ID:', lastSyncId);
+        return lastSyncId;
+      }
+      catch(err)
+      {
+        throw new BadRequestException(err.message);
+      }
     }
 
     @Get('divisionCategories')
