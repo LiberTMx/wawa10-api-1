@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserRepositoryService } from './user/services/user-repository/user-repository.service';
-import { userProvider, userRoleProvider, authDomainProvider, authGroupProvider, authFonctionProvider, authGroupRoleProvider } from './user/user.providers';
+import { userProvider, userRoleProvider, authDomainProvider, authGroupProvider, authFonctionProvider, authGroupRoleProvider, authUserFonctionProvider, authUserGroupProvider } from './user/user.providers';
 import { DatabaseModule } from '../database/database.module';
 import { credentialProvider } from './credential/credential.providers';
 import { CredentialRepositoryService } from './credential/services/credential-repository.service';
@@ -42,7 +42,7 @@ import { interclubsSemaineProvider, interclubsCategoryProvider, interclubsDivisi
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
-    UserRepositoryService, ...userProvider, ...authFonctionProvider,
+    UserRepositoryService, ...userProvider, ...authFonctionProvider, ...authUserFonctionProvider, ...authUserGroupProvider,
     AuthRoleRepositoryService, ...userRoleProvider,
     AuthDomainRepositoryService, ...authDomainProvider, 
     AuthGroupRepositoryService, ...authGroupProvider, 

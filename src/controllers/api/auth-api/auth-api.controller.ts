@@ -127,7 +127,7 @@ export class AuthApiController
   }
 
   @Get('liste')
-  async getNewsList(@Query() query): Promise<AuthUserEntity[]>
+  async getUserList(@Query() query): Promise<AuthUserEntity[]>
   {
       const readAll = query.readAll;
       const all: boolean = (readAll!==null && readAll!==undefined && (readAll==='1' || readAll==='true') );
@@ -176,12 +176,25 @@ export class AuthApiController
   } 
 
   @Post('createUser')
-  async createUser(@Request() req)
+  async createUser(@Request() req, @Headers() headers): Promise<AuthUserEntity>
   {
+    const user: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    if (user === null) {
+      throw new BadRequestException('Unauthorized access');
+    }
+    logger.debug('Current user is:', user.username);
     const body=req.body;
     logger.debug('Create a user', body.userFormValue );
     logger.debug('Create a user', body.assignedFonctions );
     logger.debug('Create a user', body.assignedRoles );
-    throw new BadRequestException('Still NOT implemented !');
+    //throw new BadRequestException('Still NOT implemented !');
+    try
+    {
+      return await this.authService.createUserByForm(body.userFormValue, body.assignedFonctions, body.assignedRoles);
+    }
+    catch(err)
+    {
+      throw new BadRequestException(err.message);
+    }
   }
 }

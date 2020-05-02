@@ -1,12 +1,12 @@
 import { Controller, Get, Request } from '@nestjs/common';
-import { InterclubsSemaineEntity } from 'src/modules/repository/interclubs/entities/interclubs-semaine.entity';
-import { InterclubsService } from 'src/modules/interclubs/services/interclubs.service';
-import { InterclubsCategoryEntity } from 'src/modules/repository/interclubs/entities/interclubs-category.entity';
 import { InterclubsDivisionEntity } from '../../../modules/repository/interclubs/entities/interclubs-division.entity';
 import { InterclubsTeamEntity } from '../../../modules/repository/interclubs/entities/interclubs-team.entity';
 import { InterclubsMatchEntity } from '../../../modules/repository/interclubs/entities/interclubs-match.entity';
 import { InterclubsLdfParticipantEntity } from '../../../modules/repository/interclubs/entities/interclubs-ldf-participant.entity';
 import { InterclubsLdfByCategoryEntity } from '../../../modules/repository/interclubs/entities/interclubs-ldf-by-category.entity';
+import { InterclubsService } from '../../../modules/interclubs/services/interclubs.service';
+import { InterclubsSemaineEntity } from '../../../modules/repository/interclubs/entities/interclubs-semaine.entity';
+import { InterclubsCategoryEntity } from '../../../modules/repository/interclubs/entities/interclubs-category.entity';
 
 @Controller('interclubs')
 export class InterclubsApiController {
