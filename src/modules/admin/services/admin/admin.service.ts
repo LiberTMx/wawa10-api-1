@@ -93,10 +93,15 @@ export class AdminService
         if( Array.isArray(rawData) )
         {
             logger.debug('rawdata is an array ! size:'+rawData.length);
+            if(rawData.length === 0) return null;
             const r0 = rawData[0];
-            logger.debug('r0 id='+r0.id);
-            const e1: AfttAllDataEntity= plainToClass(AfttAllDataEntity, rawData[0]);
-            return e1;
+            if(r0!==null || r0!==undefined)
+            {
+                logger.debug('r0 id='+r0.id);
+                const e1: AfttAllDataEntity= plainToClass(AfttAllDataEntity, rawData[0]);
+                return e1;
+            }
+            return null;
         }
         else
         {
