@@ -1,4 +1,4 @@
-import { Controller, Request, Post, HttpException, HttpStatus, Body, Headers, BadRequestException, Get, Query } from '@nestjs/common';
+import { Controller, Request, Post, HttpException, HttpStatus, Body, Headers, BadRequestException, Get, Query, Param } from '@nestjs/common';
 import { AuthService } from '../../../modules/auth/services/auth/auth.service';
 
 import * as log4js from 'log4js';
@@ -12,6 +12,7 @@ import { AuthFonctionModel } from '../../../modules/repository/user/model/auth-f
 import { AuthDomainEntity } from '../../../modules/repository/user/entities/auth-domain.entity';
 import { AuthRoleEntity } from '../../../modules/repository/user/entities/auth-role.entity';
 import { AuthGroupRoleEntity } from '../../../modules/repository/user/entities/auth-group-role.entity';
+import { AuthGroupEntity } from '../../../modules/repository/user/entities/auth-group.entity';
 const logger = log4js.getLogger('AuthApiController');
 
 @Controller('auth')
@@ -144,6 +145,21 @@ export class AuthApiController
       return users;
   }
 
+  @Get('userById/:id')
+  async getUserById(@Param() params): Promise<AuthUserEntity>
+  {
+      const userId = params.id;
+      logger.debug('user by id:', userId);
+      const user=await this.authService.getUserById(userId);
+      
+      if(user!==null && user!==undefined)
+      {
+        // remove password !
+        user.password=null;
+      }
+      return user;
+  }
+
   @Get('fonctions')
   async getAllUserFonction(): Promise<AuthFonctionEntity[]>
   {
@@ -184,9 +200,9 @@ export class AuthApiController
     }
     logger.debug('Current user is:', user.username);
     const body=req.body;
-    logger.debug('Create a user', body.userFormValue );
+/*     logger.debug('Create a user', body.userFormValue );
     logger.debug('Create a user', body.assignedFonctions );
-    logger.debug('Create a user', body.assignedRoles );
+    logger.debug('Create a user', body.assignedRoles ); */
     //throw new BadRequestException('Still NOT implemented !');
     try
     {
@@ -194,6 +210,43 @@ export class AuthApiController
     }
     catch(err)
     {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  @Get('groups/:id')
+  async getGroupsForUser(@Param() params): Promise<AuthGroupEntity[]>
+  {
+    const userId = params.id;
+    try
+    {
+      return await this.authService.getGroupsForUser(userId);
+    }
+    catch(err)
+    {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  @Post('updateUser')
+  async updateUser(@Request() req, @Headers() headers): Promise<AuthUserEntity>
+  {
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    if (connectedUser === null) {
+      throw new BadRequestException('Unauthorized access');
+    }
+    logger.debug('Current user is:', connectedUser.username, connectedUser.id);
+
+    const body=req.body;
+    logger.debug('Update a user', body.userFormValue );
+
+    try
+    {
+      return await this.authService.updateUserByForm(body.userFormValue, body.assignedFonctions, body.assignedRoles);
+    }
+    catch(err)
+    {
+      logger.error(err);
       throw new BadRequestException(err.message);
     }
   }
