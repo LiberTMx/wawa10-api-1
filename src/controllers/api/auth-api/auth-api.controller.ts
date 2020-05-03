@@ -13,6 +13,8 @@ import { AuthDomainEntity } from '../../../modules/repository/user/entities/auth
 import { AuthRoleEntity } from '../../../modules/repository/user/entities/auth-role.entity';
 import { AuthGroupRoleEntity } from '../../../modules/repository/user/entities/auth-group-role.entity';
 import { AuthGroupEntity } from '../../../modules/repository/user/entities/auth-group.entity';
+import { ResponseMessage } from '../../../shared/dto/response-message.dto';
+import { createSecureContext } from 'tls';
 const logger = log4js.getLogger('AuthApiController');
 
 @Controller('auth')
@@ -242,12 +244,81 @@ export class AuthApiController
 
     try
     {
-      return await this.authService.updateUserByForm(body.userFormValue, body.assignedFonctions, body.assignedRoles);
+      await this.authService.updateUserByForm(body.userFormValue, body.assignedFonctions, body.assignedRoles);
+      const updatedUser= await this.authService.getUserById(body.userFormValue.id);
+      logger.debug('Updated user:', updatedUser);
+      return updatedUser;
     }
     catch(err)
     {
       logger.error(err);
       throw new BadRequestException(err.message);
     }
+  }
+
+  @Post('deleteUserLogically')
+  async deleteUserLogically(@Request() req, @Headers() headers): Promise<ResponseMessage>
+  {
+    const userId=req.body.userId;
+    logger.debug('logically deleting user - id: '+userId);
+
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+    if (connectedUser === null || ! isUserClubAdmin) {
+      throw new BadRequestException('Unauthorized access');
+    }
+
+    await this.authService.deleteUserLogically(userId);
+    return new ResponseMessage('ok', '200');
+  }
+
+  @Post('deleteUserPermanently')
+  async deleteUserPermanently(@Request() req, @Headers() headers): Promise<ResponseMessage>
+  {
+    const userId=req.body.userId;
+    logger.debug('permanently deleting user - id: '+userId);
+
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+    if (connectedUser === null || ! isUserClubAdmin) {
+      throw new BadRequestException('Unauthorized access');
+    }
+
+    await this.authService.deleteUserPermanently(userId);
+    return new ResponseMessage('ok', '200');
+  }
+
+  @Post('resetUserPassword')
+  async resetUserPassword(@Request() req, @Headers() headers): Promise<ResponseMessage>
+  {
+    const userId=req.body.userId;
+    logger.debug('logically deleting user - id: '+userId);
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+    logger.debug('Connected user:'+connectedUser.username+', is club admin:'+isUserClubAdmin);
+
+    if (connectedUser === null || ! isUserClubAdmin) {
+      throw new BadRequestException('Unauthorized access');
+    }
+    await this.authService.resetUserPassword(userId);
+    return new ResponseMessage('ok', '200');
+  }
+
+  @Post('reactivateUser')
+  async reactivateUser(@Request() req, @Headers() headers): Promise<AuthUserEntity>
+  {
+    const userId=req.body.userId;
+    logger.debug('reactivate user - id: '+userId);
+
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+    if (connectedUser === null || ! isUserClubAdmin) {
+      throw new BadRequestException('Unauthorized access');
+    }
+
+    await this.authService.reactivateUser(userId);
+    const reactivatedUser= await this.authService.getUserById(userId);
+    logger.debug('reactivatedUser user:', reactivatedUser);
+    return reactivatedUser;
   }
 }

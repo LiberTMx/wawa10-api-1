@@ -153,6 +153,34 @@ export class AuthService
        return authUser;
     }
 
+    private async getUserRoles(user: AuthUserEntity): Promise<AuthRoleEntity[]>
+    {
+      const roles=await this.userRepositoryService.getUserRoles(user.id);
+      const rr: AuthRoleEntity[]=new Array<AuthRoleEntity>();
+
+      if(roles!==null && roles!==undefined)
+      {
+        if(roles.length>0)
+        {
+         
+         for(const r of roles)
+         {
+           const domain: AuthDomainEntity=await this.authDomainRepositoryService.findDomainById(r.domain_id);
+           if(domain!==null && domain!==undefined) 
+           {
+             //rr.push(role);
+             const role=new AuthRoleEntity();
+             role.id=r.id;
+             role.role=r.role;
+             role.authDomain=domain;
+             rr.push(role);
+           }
+         }
+        }
+      }
+      return rr;
+    }
+
     private buildChangePasswordJeton(): string
     {
       return guid.raw();
@@ -453,7 +481,8 @@ export class AuthService
       return this.authGroupRepositoryService.getGroupsForUser(userId);
     }
 
-    async updateUserByForm(userFormValue: any, assignedFonctions: string, assignedRoles: string): Promise<AuthUserEntity>
+    @Transactional()
+    async updateUserByForm(userFormValue: any, assignedFonctions: string, assignedRoles: string)//: Promise<AuthUserEntity>
     {
       const userId=userFormValue.id;
 
@@ -557,7 +586,11 @@ export class AuthService
         }
       }
 
-      return await this.getUserById(userId);
+      /*
+      const updatedUser= await this.getUserById(userId);
+      logger.debug('Updated user:', updatedUser);
+      return updatedUser;
+      */
     }
 
     async deleteFonctionsForUser(user: AuthUserEntity)
@@ -569,5 +602,52 @@ export class AuthService
           await await this.userRepositoryService.deleteUserAuthFonction(user, uf);
         }
       }
+    }
+
+    async deleteUserLogically(userId: number)
+    {
+      await this.userRepositoryService.deleteUserLogically(userId);
+    }
+
+    async deleteUserPermanently(userId: number)
+    {
+      await this.userRepositoryService.deleteUserPermanently(userId);
+    }
+    
+    @Transactional()
+    async reactivateUser(userId: number)
+    {
+      await this.userRepositoryService.reactivateUser(userId);
+    }
+
+    async verifyUserIsClubAdmain(user: AuthUserEntity): Promise<boolean>
+    {
+      // const roles=await this.userRepositoryService.getUserRoles(user.id);
+      const roles: AuthRoleEntity[] = await this.getUserRoles(user);
+      if(roles===null || roles===undefined) return false;
+
+      for(const r of roles)
+      {
+        if(r.role === 'admin' && r.authDomain.domain==='club') return true;
+      }
+      return false;
+    }
+
+    async resetUserPassword(userId: number): Promise<AuthUserEntity>
+    {
+      // return await this.userRepositoryService.resetUserPassword(userId); 
+      const user: AuthUserEntity = await this.userRepositoryService.findUserById(userId);
+      if(user===null || user===undefined || user.deletedAt !==null) return user;
+      if(user.email === 'nobody@liwa.be')
+      {
+        // NE PAS FAIRE DE RESET DANS CE CAS ! Il faut une adresse mail VALIDE !
+        throw new BadRequestException('Adresse email requise !');
+      }
+
+      // password par defaut: newLiwaUserPwd
+      user.password='6fd65094fbfce71dd68b619ad8cbbacf7d08c7d9f6d9b33468e59134b5288f00';
+      user.mustChangePassword=true;
+
+      return this.userRepositoryService.saveUser(user);
     }
 }

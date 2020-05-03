@@ -171,4 +171,26 @@ export class UserRepositoryService
             await this.authUserFonctionRepository.delete(uf);
         }
     }
+
+    async deleteUserLogically(userId: number): Promise<AuthUserEntity>
+    {
+        const user=await this.findUserById(userId);
+        user.deletedAt = new Date();
+        return this.userRepository.save(user);
+    }
+
+    async deleteUserPermanently(userId: number)
+    {
+        const user=await this.findUserById(userId);
+        this.userRepository.delete(user);
+    }
+
+    async reactivateUser(userId: number): Promise<AuthUserEntity>
+    {
+        const user=await this.findUserById(userId);
+        user.deletedAt = null;
+        user.updateddAt = new Date();
+        return this.userRepository.save(user);
+    }
+
 }
