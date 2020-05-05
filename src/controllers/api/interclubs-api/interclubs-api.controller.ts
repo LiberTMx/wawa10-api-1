@@ -7,6 +7,7 @@ import { InterclubsLdfByCategoryEntity } from '../../../modules/repository/inter
 import { InterclubsService } from '../../../modules/interclubs/services/interclubs.service';
 import { InterclubsSemaineEntity } from '../../../modules/repository/interclubs/entities/interclubs-semaine.entity';
 import { InterclubsCategoryEntity } from '../../../modules/repository/interclubs/entities/interclubs-category.entity';
+import { InterclubsSemaineVersionEntity } from '../../../modules/repository/interclubs/entities/interclubs-semaine-version.entity';
 
 @Controller('interclubs')
 export class InterclubsApiController {
@@ -57,6 +58,13 @@ export class InterclubsApiController {
     async getInterclubsLDFByCategory(@Request() req): Promise< InterclubsLdfByCategoryEntity[] >
     {
         return this.interclubsService.getInterclubsLDFByCategory();
+    }
+
+    @Get('semaineNextVersion/:semaineId')
+    async getSemaineNextVersion(@Request() req): Promise< InterclubsSemaineVersionEntity >
+    {
+        const semaineId = req.params.semaineId;
+        return await this.interclubsService.getSemaineNextVersion(semaineId);
     }
 
 }

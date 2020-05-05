@@ -16,6 +16,8 @@ import { StatusApiController } from './status-api/status-api.controller';
 import { RoiApiController } from './roi-api/roi-api.controller';
 import { InterclubsApiController } from './interclubs-api/interclubs-api.controller';
 import { InterclubsModule } from '../../modules/interclubs/interclubs.module';
+import { EntrainementApiController } from './entrainement-api/entrainement-api.controller';
+import { EntrainementModule } from '../../modules/entrainement/entrainement.module';
 
 @Module({
   imports: [
@@ -30,6 +32,7 @@ import { InterclubsModule } from '../../modules/interclubs/interclubs.module';
     NewsModule,
     ParametreModule,
     InterclubsModule,
+    EntrainementModule,
   ],
   controllers: [
     AuthApiController,
@@ -40,6 +43,7 @@ import { InterclubsModule } from '../../modules/interclubs/interclubs.module';
     StatusApiController,
     RoiApiController,
     InterclubsApiController,
+    EntrainementApiController,
   ],
   providers: [
   ],

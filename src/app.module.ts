@@ -16,6 +16,7 @@ import { ParametreModule } from './modules/parametre/parametre.module';
 import { StatusModule } from './modules/status/status.module';
 import { RoiModule } from './modules/roi/roi.module';
 import { InterclubsModule } from './modules/interclubs/interclubs.module';
+import { EntrainementModule } from './modules/entrainement/entrainement.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { InterclubsModule } from './modules/interclubs/interclubs.module';
     StatusModule,
     RoiModule,
     InterclubsModule,
+    EntrainementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

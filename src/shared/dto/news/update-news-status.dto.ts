@@ -1,6 +1,6 @@
 
 import { IsEmail, MinLength } from 'class-validator';
-import { NewsType } from '../../../modules/news/types/news-status.enum';
+import { NewsStatusType } from '../../../modules/news/types/news-status.enum';
 
 /*
       id
@@ -15,6 +15,6 @@ import { NewsType } from '../../../modules/news/types/news-status.enum';
 export class UpdateNewsStatusDTO {
 
     newsId: number;
-    newStatus: NewsType;
+    newStatus: NewsStatusType;
 
 }
