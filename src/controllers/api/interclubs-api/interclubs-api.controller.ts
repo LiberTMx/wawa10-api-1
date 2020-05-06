@@ -1,4 +1,4 @@
-import { Controller, Get, Request } from '@nestjs/common';
+import { Controller, Get, Request, Post } from '@nestjs/common';
 import { InterclubsDivisionEntity } from '../../../modules/repository/interclubs/entities/interclubs-division.entity';
 import { InterclubsTeamEntity } from '../../../modules/repository/interclubs/entities/interclubs-team.entity';
 import { InterclubsMatchEntity } from '../../../modules/repository/interclubs/entities/interclubs-match.entity';
@@ -59,4 +59,10 @@ export class InterclubsApiController {
         return this.interclubsService.getInterclubsLDFByCategory();
     }
 
+    @Post('addSemaineVersion')
+    async addSemaineVersion(@Request() req)
+    {
+        const semaineId = req.body.semaineId;
+        return this.interclubsService.addSemaineVersion(semaineId);
+    }
 }

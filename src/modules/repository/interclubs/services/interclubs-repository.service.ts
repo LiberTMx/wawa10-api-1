@@ -13,6 +13,9 @@ import { InterclubsLdfByCategoryEntity } from '../entities/interclubs-ldf-by-cat
 @Injectable()
 export class InterclubsRepositoryService 
 {
+    query(arg0: string): any {
+        throw new Error("Method not implemented.");
+    }
     constructor(
      /*    @Inject('interclubsRepositoryToken')
         private readonly interclubsRepository: BaseRepository<interclubsEntity>, */

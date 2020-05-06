@@ -8,6 +8,7 @@ import { InterclubsLdfByCategoryEntity } from '../../repository/interclubs/entit
 import { InterclubsRepositoryService } from '../../repository/interclubs/services/interclubs-repository.service';
 import { InterclubsSemaineEntity } from '../../repository/interclubs/entities/interclubs-semaine.entity';
 import { InterclubsCategoryEntity } from '../../repository/interclubs/entities/interclubs-category.entity';
+import { InterclubsSemaineVersionEntity } from 'src/modules/repository/interclubs/entities/interclubs-semaine-version.entity';
 
 @Injectable()
 export class InterclubsService 
@@ -66,5 +67,35 @@ export class InterclubsService
     async getInterclubsLDFByCategory(): Promise< InterclubsLdfByCategoryEntity[] >
     {
         return this.interclubsRepositoryService.getInterclubsLDFByCategory();
+    }
+    async addSemaineVersion(semaineId: number): Promise< InterclubsSemaineVersionEntity[]>
+    {
+        /*
+
+        select isv.* from interclub_semaine_version  isv
+            inner join 
+            (
+                select max(sv.semaine_version) as version from interclub_semaine_version sv where sv.semaine_id = 1
+            ) as t
+            on isv.semaine_id = 1 and semaine_version = t.version
+            ;
+
+        */
+
+       const rawData: any=this.interclubsRepositoryService.query(
+        'select isv.* '+
+        'from interclub_semaine_version  isv  ' +
+        'INNER JOIN  ' +
+        '( ' +
+        'SELECT  ' +
+        'max(sv.semaine_version) as version ' +
+        'from interclub_semaine_version sv ' +
+        'where ' +
+        'sv.semaine_id = ' + semaineId +
+        ') AS t ' +
+        'on isv.semaine_id = ' + semaineId + ' and semaine_version = t.version '  
+        );
+
+        return rawData;
     }
 }
