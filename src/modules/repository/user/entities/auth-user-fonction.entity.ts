@@ -1,14 +1,14 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity({name: 'auth_user_fonction'})
+@Entity({name: 'auth_user_fonctions_auth_fonction'})
 export class AuthUserFonctionEntity {
 
     @PrimaryColumn()
     id: number;
 
-    @Column({name: 'auth_user_id'})
+    @Column({name: 'authUserId'})
     authUserID: number;
 
-    @Column({name: 'fonction_id'})
+    @Column({name: 'authFonctionId'})
     fonctionID: number;
 }

@@ -153,6 +153,34 @@ export class AuthService
        return authUser;
     }
 
+    private async getUserRoles(user: AuthUserEntity): Promise<AuthRoleEntity[]>
+    {
+      const roles=await this.userRepositoryService.getUserRoles(user.id);
+      const rr: AuthRoleEntity[]=new Array<AuthRoleEntity>();
+
+      if(roles!==null && roles!==undefined)
+      {
+        if(roles.length>0)
+        {
+         
+         for(const r of roles)
+         {
+           const domain: AuthDomainEntity=await this.authDomainRepositoryService.findDomainById(r.domain_id);
+           if(domain!==null && domain!==undefined) 
+           {
+             //rr.push(role);
+             const role=new AuthRoleEntity();
+             role.id=r.id;
+             role.role=r.role;
+             role.authDomain=domain;
+             rr.push(role);
+           }
+         }
+        }
+      }
+      return rr;
+    }
+
     private buildChangePasswordJeton(): string
     {
       return guid.raw();
@@ -323,6 +351,11 @@ export class AuthService
       return await this.userRepositoryService.getUserList(readAll);
     }
 
+    async getUserById(userId: number): Promise<AuthUserEntity>
+    {
+      return await this.userRepositoryService.findUserById(userId);
+    }
+    
     async getAllUserFonction(): Promise<AuthFonctionEntity[]>
     {
       return await this.userRepositoryService.getAllUserFonction();
@@ -441,5 +474,180 @@ export class AuthService
       }
 
       return user;
+    }
+
+    async getGroupsForUser(userId: number): Promise<AuthGroupEntity[]>
+    {
+      return this.authGroupRepositoryService.getGroupsForUser(userId);
+    }
+
+    @Transactional()
+    async updateUserByForm(userFormValue: any, assignedFonctions: string, assignedRoles: string)//: Promise<AuthUserEntity>
+    {
+      const userId=userFormValue.id;
+
+      logger.debug('Reading User to update...!');
+      const u = await this.getUserById(userId);
+      logger.debug('User to update is found!');
+
+      u.nom=userFormValue.nom;
+      u.prenom=userFormValue.prenom;
+      //u.username=userFormValue.username;
+      u.email=userFormValue.email;
+
+      //const dateString = '20180715';
+      // 16/09/1962
+      if(userFormValue.dateNaissance!==null && userFormValue.dateNaissance!==undefined && userFormValue.dateNaissance.length===10)
+      {
+        const dateString =userFormValue.dateNaissance;
+        const year = +dateString.substr(6, 4);
+        const month = (+dateString.substr(3, 2) ) - 1;
+        const day = +dateString.substr(0, 2);
+        const dateNaissance = new Date(year, month, day);
+  
+        u.dateNaissance=dateNaissance;
+      }
+
+      u.gestionParentale=userFormValue.gestionParentale;
+
+      u.rue=userFormValue.rue;
+      u.numero=userFormValue.numero;
+      u.boite=userFormValue.boitre;
+      u.codePostal=userFormValue.codePostal;
+      u.localite=userFormValue.localite;
+
+      u.numTel=userFormValue.tel;
+      u.numTelPrive=userFormValue.telPrive;
+      u.numMobile=userFormValue.gsm;
+      u.sexe=userFormValue.sexe;
+      u.licence=userFormValue.licence;
+      u.classementMessieur=userFormValue.classementH;
+      u.classementDame=userFormValue.classementD;
+      u.comment=userFormValue.comment;
+      u.commentComite=userFormValue.commentComite;
+      u.isStageParticipantDiscret= userFormValue.isStageParticipantDiscret;
+
+      // password par defaut: newLiwaUserPwd
+      //u.password='6fd65094fbfce71dd68b619ad8cbbacf7d08c7d9f6d9b33468e59134b5288f00';
+      //u.mustChangePassword=true;
+      u.membreComite=false;
+      const now: Date=new Date();
+      //u.createdAt=now;
+      u.updateddAt=now;
+
+      // Les fonctions
+      await this.deleteFonctionsForUser(u);
+      u.fonctions=null;
+
+      let isMembreComite=false;
+      const fonctions: AuthFonctionEntity[] = JSON.parse(assignedFonctions);
+      if(fonctions!==null && fonctions!==undefined && fonctions.length>0)
+      {
+        for(const f of fonctions)
+        {
+          if(f.membreComite===true)
+          {
+            isMembreComite=true;
+            break;
+          }
+        }
+      }
+      u.membreComite=isMembreComite;
+
+      logger.debug('Saving modifications!');
+      const user = await this.userRepositoryService.saveUser(u);
+
+      logger.debug('Modifications sauvées, construction des fonctions!', fonctions);
+
+      if(fonctions!==null && fonctions!==undefined && fonctions.length>0)
+      {
+        for(const f of fonctions)
+        {
+          const auf = new AuthUserFonctionEntity();
+          auf.authUserID=user.id;
+          auf.fonctionID=f.id;
+          await this.userRepositoryService.saveAuthUserFonction(auf);
+        }
+      }
+
+      // Les groupes de roles
+      logger.debug('Deleting groups!', u.id);
+      await this.authGroupRepositoryService.deleteGroupsForUser(userId);
+      const groups: AuthGroupEntity[]=JSON.parse(assignedRoles);
+      logger.debug('rebuilding groups!', groups);
+      if(groups!==null && groups!==undefined && groups.length>0)
+      {
+        for(const g of groups)
+        {
+          const ug = new AuthUserGroupEntity();
+          ug.authUserId=user.id;
+          ug.authGroupId=g.id;
+          await this.userRepositoryService.saveAuthUserGroup(ug);
+        }
+      }
+
+      /*
+      const updatedUser= await this.getUserById(userId);
+      logger.debug('Updated user:', updatedUser);
+      return updatedUser;
+      */
+    }
+
+    async deleteFonctionsForUser(user: AuthUserEntity)
+    {
+      if(user.fonctions!==null && user.fonctions!==undefined && user.fonctions.length> 0)
+      {
+        for(const uf of user.fonctions)
+        {
+          await await this.userRepositoryService.deleteUserAuthFonction(user, uf);
+        }
+      }
+    }
+
+    async deleteUserLogically(userId: number)
+    {
+      await this.userRepositoryService.deleteUserLogically(userId);
+    }
+
+    async deleteUserPermanently(userId: number)
+    {
+      await this.userRepositoryService.deleteUserPermanently(userId);
+    }
+    
+    @Transactional()
+    async reactivateUser(userId: number)
+    {
+      await this.userRepositoryService.reactivateUser(userId);
+    }
+
+    async verifyUserIsClubAdmain(user: AuthUserEntity): Promise<boolean>
+    {
+      // const roles=await this.userRepositoryService.getUserRoles(user.id);
+      const roles: AuthRoleEntity[] = await this.getUserRoles(user);
+      if(roles===null || roles===undefined) return false;
+
+      for(const r of roles)
+      {
+        if(r.role === 'admin' && r.authDomain.domain==='club') return true;
+      }
+      return false;
+    }
+
+    async resetUserPassword(userId: number): Promise<AuthUserEntity>
+    {
+      // return await this.userRepositoryService.resetUserPassword(userId); 
+      const user: AuthUserEntity = await this.userRepositoryService.findUserById(userId);
+      if(user===null || user===undefined || user.deletedAt !==null) return user;
+      if(user.email === 'nobody@liwa.be')
+      {
+        // NE PAS FAIRE DE RESET DANS CE CAS ! Il faut une adresse mail VALIDE !
+        throw new BadRequestException('Adresse email requise !');
+      }
+
+      // password par defaut: newLiwaUserPwd
+      user.password='6fd65094fbfce71dd68b619ad8cbbacf7d08c7d9f6d9b33468e59134b5288f00';
+      user.mustChangePassword=true;
+
+      return this.userRepositoryService.saveUser(user);
     }
 }

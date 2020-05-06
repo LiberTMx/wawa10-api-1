@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, JoinTable, ManyToMany } from 'typeorm';
+import { AuthFonctionEntity } from './auth-fonction.entity';
 
 //import { Column, OneToOne, JoinColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 //import { AuthUserGroupEntity } from './auth-user-group.entity';
@@ -112,4 +113,17 @@ export class AuthUserEntity
 
     @Column({name: 'is_stage_participant_discret'})
     isStageParticipantDiscret: boolean;
+
+    // relations
+    @ManyToMany(type => AuthFonctionEntity)
+    @JoinTable(/*
+            {
+                name: 'auth_user_fonction',
+                joinColumn: {
+                    name: 'fonction_id',
+                    //referencedColumnName: 'id',
+                },
+            },*/
+        )
+    fonctions: AuthFonctionEntity[];
 }

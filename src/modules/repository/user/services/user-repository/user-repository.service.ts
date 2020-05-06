@@ -48,6 +48,7 @@ export class UserRepositoryService
         });*/
 
         const user=this.userRepository.createQueryBuilder('authUser')
+            .leftJoinAndSelect('authUser.fonctions', 'auth_fonction')
             .where('authUser.username = :username', {username})
             .andWhere('authUser.deleted_at is null')
             .getOne();
@@ -71,9 +72,10 @@ export class UserRepositoryService
        ` inner join auth_user_group ug on ug.group_id=g.id and ug.user_id= ${userid} ` );
     }
 
-    async findById(userID: number): Promise<AuthUserEntity> 
+    async findUserById(userID: number): Promise<AuthUserEntity> 
     {
         const user=this.userRepository.createQueryBuilder('authUser')
+            .leftJoinAndSelect('authUser.fonctions', 'auth_fonction')
             .where('authUser.id = :id', {id: userID})
             .getOne();
         return user;
@@ -92,6 +94,7 @@ export class UserRepositoryService
 
             return this.userRepository
             .createQueryBuilder('authUser')
+            .leftJoinAndSelect('authUser.fonctions', 'auth_fonction')
             //.where(' authUser.deletedAt is null ')
             .orderBy('authUser.nom', 'ASC')
             .addOrderBy('authUser.prenom', 'ASC')
@@ -100,11 +103,21 @@ export class UserRepositoryService
 
         return this.userRepository
             .createQueryBuilder('authUser')
+            .leftJoinAndSelect('authUser.fonctions', 'auth_fonction')
             .where(' authUser.deletedAt is null ')
             .orderBy('authUser.nom', 'ASC')
             .addOrderBy('authUser.prenom', 'ASC')
             .getMany();
     } 
+
+/*     async getUserById(userId: number): Promise<AuthUserEntity>
+    {
+        return this.userRepository
+            .createQueryBuilder('authUser')
+            .leftJoinAndSelect('authUser.fonctions', 'auth_fonction')
+            .where(' authUser.id = :id ', { id:userId })
+            .getOne();
+    } */
 
     async getAllUserFonction(): Promise<AuthFonctionEntity[]>
     {
@@ -130,6 +143,7 @@ export class UserRepositoryService
     async findUserByLicence(licence: string): Promise<AuthUserEntity>
     {
         const user=this.userRepository.createQueryBuilder('authUser')
+            .leftJoinAndSelect('authUser.fonctions', 'auth_fonction')
             .where('authUser.licence = :licence', { licence })
             .getOne();
         return user;
@@ -144,4 +158,39 @@ export class UserRepositoryService
     {
         return this.authUserGroupRepository.save(aug);
     }
+
+    async deleteUserAuthFonction(user: AuthUserEntity, af: AuthFonctionEntity)
+    {
+        const uf: AuthUserFonctionEntity = await this.authUserFonctionRepository.createQueryBuilder('auf')
+            .where('auf.authUserID = :userId', {userId: user.id})
+            .where('auf.fonctionID = :fonctionId', {fonctionId: af.id})
+            .getOne();
+
+        if(uf !== null && uf !== undefined)
+        {
+            await this.authUserFonctionRepository.delete(uf);
+        }
+    }
+
+    async deleteUserLogically(userId: number): Promise<AuthUserEntity>
+    {
+        const user=await this.findUserById(userId);
+        user.deletedAt = new Date();
+        return this.userRepository.save(user);
+    }
+
+    async deleteUserPermanently(userId: number)
+    {
+        const user=await this.findUserById(userId);
+        this.userRepository.delete(user);
+    }
+
+    async reactivateUser(userId: number): Promise<AuthUserEntity>
+    {
+        const user=await this.findUserById(userId);
+        user.deletedAt = null;
+        user.updateddAt = new Date();
+        return this.userRepository.save(user);
+    }
+
 }

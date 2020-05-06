@@ -1,8 +1,7 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { NewsEntity } from '../../entities/news.entity';
 import { BaseRepository } from 'typeorm-transactional-cls-hooked';
-import { NewsImageEntity } from '../../entities/news-image.entity';
-import { NewsType } from '../../../../news/types/news-status.enum';
+import { NewsStatusType } from '../../../../news/types/news-status.enum';
 
 import * as log4js from 'log4js';
 const logger = log4js.getLogger('NewsRepositoryService');
@@ -53,8 +52,9 @@ export class NewsRepositoryService
                 //.where(' news.status = :status ', { status: 'VISIBLE'})
                 //.andWhere(' news.id = image.newsId')
                 //.andWhere(' news.id = document.newsId')
-                .orderBy('news.showOrder', 'DESC')
+                //.orderBy('news.showOrder', 'DESC')
                 //.addOrderBy('news.createdAt DESC')
+                .orderBy('news.createdAt', 'DESC')
                 .getMany();
         }
 
@@ -64,11 +64,12 @@ export class NewsRepositoryService
             .leftJoinAndSelect('news.image', 'image')
             .leftJoinAndSelect('news.document', 'document')
             .leftJoinAndSelect('news.auteur', 'auteur')
-            .where(' news.status = :status ', { status: NewsType.VISIBLE })
+            .where(' news.status = :status ', { status: NewsStatusType.VISIBLE })
             //.andWhere(' news.id = image.newsId')
             //.andWhere(' news.id = document.newsId')
-            .orderBy('news.showOrder', 'DESC')
+            //.orderBy('news.showOrder', 'DESC')
             //.addOrderBy('news.createdAt DESC')
+            .orderBy('news.createdAt', 'DESC')
             .getMany();
     }
 

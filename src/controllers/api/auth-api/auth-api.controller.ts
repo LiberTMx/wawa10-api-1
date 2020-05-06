@@ -1,4 +1,4 @@
-import { Controller, Request, Post, HttpException, HttpStatus, Body, Headers, BadRequestException, Get, Query } from '@nestjs/common';
+import { Controller, Request, Post, HttpException, HttpStatus, Body, Headers, BadRequestException, Get, Query, Param } from '@nestjs/common';
 import { AuthService } from '../../../modules/auth/services/auth/auth.service';
 
 import * as log4js from 'log4js';
@@ -12,6 +12,9 @@ import { AuthFonctionModel } from '../../../modules/repository/user/model/auth-f
 import { AuthDomainEntity } from '../../../modules/repository/user/entities/auth-domain.entity';
 import { AuthRoleEntity } from '../../../modules/repository/user/entities/auth-role.entity';
 import { AuthGroupRoleEntity } from '../../../modules/repository/user/entities/auth-group-role.entity';
+import { AuthGroupEntity } from '../../../modules/repository/user/entities/auth-group.entity';
+import { ResponseMessage } from '../../../shared/dto/response-message.dto';
+import { createSecureContext } from 'tls';
 const logger = log4js.getLogger('AuthApiController');
 
 @Controller('auth')
@@ -144,6 +147,21 @@ export class AuthApiController
       return users;
   }
 
+  @Get('userById/:id')
+  async getUserById(@Param() params): Promise<AuthUserEntity>
+  {
+      const userId = params.id;
+      logger.debug('user by id:', userId);
+      const user=await this.authService.getUserById(userId);
+      
+      if(user!==null && user!==undefined)
+      {
+        // remove password !
+        user.password=null;
+      }
+      return user;
+  }
+
   @Get('fonctions')
   async getAllUserFonction(): Promise<AuthFonctionEntity[]>
   {
@@ -184,9 +202,9 @@ export class AuthApiController
     }
     logger.debug('Current user is:', user.username);
     const body=req.body;
-    logger.debug('Create a user', body.userFormValue );
+/*     logger.debug('Create a user', body.userFormValue );
     logger.debug('Create a user', body.assignedFonctions );
-    logger.debug('Create a user', body.assignedRoles );
+    logger.debug('Create a user', body.assignedRoles ); */
     //throw new BadRequestException('Still NOT implemented !');
     try
     {
@@ -196,5 +214,111 @@ export class AuthApiController
     {
       throw new BadRequestException(err.message);
     }
+  }
+
+  @Get('groups/:id')
+  async getGroupsForUser(@Param() params): Promise<AuthGroupEntity[]>
+  {
+    const userId = params.id;
+    try
+    {
+      return await this.authService.getGroupsForUser(userId);
+    }
+    catch(err)
+    {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  @Post('updateUser')
+  async updateUser(@Request() req, @Headers() headers): Promise<AuthUserEntity>
+  {
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    if (connectedUser === null) {
+      throw new BadRequestException('Unauthorized access');
+    }
+    logger.debug('Current user is:', connectedUser.username, connectedUser.id);
+
+    const body=req.body;
+    logger.debug('Update a user', body.userFormValue );
+
+    try
+    {
+      await this.authService.updateUserByForm(body.userFormValue, body.assignedFonctions, body.assignedRoles);
+      const updatedUser= await this.authService.getUserById(body.userFormValue.id);
+      logger.debug('Updated user:', updatedUser);
+      return updatedUser;
+    }
+    catch(err)
+    {
+      logger.error(err);
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  @Post('deleteUserLogically')
+  async deleteUserLogically(@Request() req, @Headers() headers): Promise<ResponseMessage>
+  {
+    const userId=req.body.userId;
+    logger.debug('logically deleting user - id: '+userId);
+
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+    if (connectedUser === null || ! isUserClubAdmin) {
+      throw new BadRequestException('Unauthorized access');
+    }
+
+    await this.authService.deleteUserLogically(userId);
+    return new ResponseMessage('ok', '200');
+  }
+
+  @Post('deleteUserPermanently')
+  async deleteUserPermanently(@Request() req, @Headers() headers): Promise<ResponseMessage>
+  {
+    const userId=req.body.userId;
+    logger.debug('permanently deleting user - id: '+userId);
+
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+    if (connectedUser === null || ! isUserClubAdmin) {
+      throw new BadRequestException('Unauthorized access');
+    }
+
+    await this.authService.deleteUserPermanently(userId);
+    return new ResponseMessage('ok', '200');
+  }
+
+  @Post('resetUserPassword')
+  async resetUserPassword(@Request() req, @Headers() headers): Promise<ResponseMessage>
+  {
+    const userId=req.body.userId;
+    logger.debug('logically deleting user - id: '+userId);
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+    logger.debug('Connected user:'+connectedUser.username+', is club admin:'+isUserClubAdmin);
+
+    if (connectedUser === null || ! isUserClubAdmin) {
+      throw new BadRequestException('Unauthorized access');
+    }
+    await this.authService.resetUserPassword(userId);
+    return new ResponseMessage('ok', '200');
+  }
+
+  @Post('reactivateUser')
+  async reactivateUser(@Request() req, @Headers() headers): Promise<AuthUserEntity>
+  {
+    const userId=req.body.userId;
+    logger.debug('reactivate user - id: '+userId);
+
+    const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+    const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+    if (connectedUser === null || ! isUserClubAdmin) {
+      throw new BadRequestException('Unauthorized access');
+    }
+
+    await this.authService.reactivateUser(userId);
+    const reactivatedUser= await this.authService.getUserById(userId);
+    logger.debug('reactivatedUser user:', reactivatedUser);
+    return reactivatedUser;
   }
 }
