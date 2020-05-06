@@ -60,7 +60,6 @@ export const interclubsMatchProvider = [
   },
 ];
 
-
 // InterclubsLdfParticipantEntity
 export const interclubsLdfParticipantProvider = [
   {

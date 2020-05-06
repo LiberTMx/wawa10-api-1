@@ -9,6 +9,7 @@ import { InterclubsMatchEntity } from '../entities/interclubs-match.entity';
 import { AfttMatchEntity } from '../../aftt/entities/aftt-match.entity';
 import { InterclubsLdfParticipantEntity } from '../entities/interclubs-ldf-participant.entity';
 import { InterclubsLdfByCategoryEntity } from '../entities/interclubs-ldf-by-category.entity';
+import { InterclubsSemaineVersionEntity } from '../entities/interclubs-semaine-version.entity';
 
 @Injectable()
 export class InterclubsRepositoryService 
@@ -34,6 +35,9 @@ export class InterclubsRepositoryService
         private readonly interclubsLdfParticipantRepository: BaseRepository<InterclubsLdfParticipantEntity>,
         @Inject('interclubsLdfByCategoryRepositoryToken')
         private readonly interclubsLdfByCategoryRepository: BaseRepository<InterclubsLdfByCategoryEntity>,
+
+        @Inject('interclubsSemaineVersionRepositoryToken')
+        private readonly interclubsSemaineVersionProvider: BaseRepository<InterclubsSemaineEntity>,
 
     ) {}
 
@@ -172,5 +176,29 @@ export class InterclubsRepositoryService
     async getInterclubsLDFByCategory(): Promise< InterclubsLdfByCategoryEntity[] >
     {
         return this.interclubsLdfByCategoryRepository.find();
+    }
+
+    async getLastSemaineVersion(semaineId: number): Promise< InterclubsSemaineVersionEntity >
+    {
+        const rawData: any=this.interclubsSemaineVersionProvider.query(
+            'SELECT  * '+
+            'FROM interclubs_semaine_version  isv ' +
+            'INNER JOIN  ' +
+            '( ' +
+            'SELECT  ' +
+            'MAX(vv.semaine_version) max_version ' +
+            'FROM interclubs_semaine_version vv ' +
+            'where semaine_id = '+ semaineId +
+            //'GROUP BY Date(`created_at`) ' +
+            ') AS t ' +
+            'ON isv.semaine_version = t.max_version '  +
+            'where semaine_id = '+ semaineId    );
+
+        return rawData;
+    }
+
+    async saveSemaineVersion(semaineVersion: InterclubsSemaineVersionEntity): Promise< InterclubsSemaineVersionEntity >
+    {
+        return this.interclubsSemaineVersionProvider.save(semaineVersion);
     }
 }

@@ -8,13 +8,16 @@ export class InterclubsSemaineVersionEntity
     id: number;
 
     @Column({name: 'semaine_id'})
-    semaineId: number; 
+
+    // tslint:disable-next-line:variable-name
+    semaine_id: number; // tinyint(2) unsigned NOT NULL,  -- FK
     
     @Column({name: 'semaine_version'})
-    semaineVersion: number; 
+    // tslint:disable-next-line:variable-name
+    semaine_version: number; // int,
 
     @Column({name: 'semaine_version_statut'})
-    semaineVersionStatut: string;
-
+    // tslint:disable-next-line:variable-name
+    semaine_version_statut: string; // varchar(5),
 }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InterclubsType } from '../enum/interclubs.enum';
 import { InterclubsDivisionEntity } from '../../repository/interclubs/entities/interclubs-division.entity';
 import { InterclubsTeamEntity } from '../../repository/interclubs/entities/interclubs-team.entity';
@@ -8,7 +8,13 @@ import { InterclubsLdfByCategoryEntity } from '../../repository/interclubs/entit
 import { InterclubsRepositoryService } from '../../repository/interclubs/services/interclubs-repository.service';
 import { InterclubsSemaineEntity } from '../../repository/interclubs/entities/interclubs-semaine.entity';
 import { InterclubsCategoryEntity } from '../../repository/interclubs/entities/interclubs-category.entity';
-import { InterclubsSemaineVersionEntity } from 'src/modules/repository/interclubs/entities/interclubs-semaine-version.entity';
+
+import { InterclubsSemaineVersionEntity } from '../../repository/interclubs/entities/interclubs-semaine-version.entity';
+
+import * as log4js from 'log4js';
+import { plainToClass } from 'class-transformer';
+const logger = log4js.getLogger('InterclubsService');
+
 
 @Injectable()
 export class InterclubsService 
@@ -68,34 +74,44 @@ export class InterclubsService
     {
         return this.interclubsRepositoryService.getInterclubsLDFByCategory();
     }
-    async addSemaineVersion(semaineId: number): Promise< InterclubsSemaineVersionEntity[]>
+
+    async getSemaineNextVersion(semaineId: number): Promise< InterclubsSemaineVersionEntity >
     {
-        /*
+        /*const semaineVersion: InterclubsSemaineVersionEntity*/ 
+        const rawData= await this.interclubsRepositoryService.getLastSemaineVersion(semaineId);
+        
+        if( Array.isArray(rawData) )
+        {
+            if(rawData.length===0)
+            {
+                logger.debug('no last semaine version for semaine ', semaineId);
+                const newSemaineVersion = new InterclubsSemaineVersionEntity();
+                newSemaineVersion.semaine_id=semaineId;
+                newSemaineVersion.semaine_version=1;
+                newSemaineVersion.semaine_version_statut='working';
+                return this.interclubsRepositoryService.saveSemaineVersion(newSemaineVersion);
+            }
+            else
+            {
+                //const semaineVersion: InterclubsSemaineVersionEntity=rawData[0];
+                
+  /*               semaineVersion.id=undefined;
+                semaineVersion.semaineVersion++;
+                semaineVersion.semaineVersionStatut='working'; */
+                const vv = plainToClass(InterclubsSemaineVersionEntity, rawData[0]);
+                logger.debug('last semaine version', vv);
+                let newSemaineVersion = new InterclubsSemaineVersionEntity();
+                newSemaineVersion.semaine_id=semaineId;
+                newSemaineVersion.semaine_version= 1+ Number(vv.semaine_version);
+                newSemaineVersion.semaine_version_statut='working';
+                logger.debug('saving semaine new version', newSemaineVersion);
+                newSemaineVersion =  await this.interclubsRepositoryService.saveSemaineVersion(newSemaineVersion);
+                vv.semaine_version_statut = 'closed';
+                await this.interclubsRepositoryService.saveSemaineVersion(vv);
+                return newSemaineVersion;
+            }
+        }
 
-        select isv.* from interclub_semaine_version  isv
-            inner join 
-            (
-                select max(sv.semaine_version) as version from interclub_semaine_version sv where sv.semaine_id = 1
-            ) as t
-            on isv.semaine_id = 1 and semaine_version = t.version
-            ;
-
-        */
-
-       const rawData: any=this.interclubsRepositoryService.query(
-        'select isv.* '+
-        'from interclub_semaine_version  isv  ' +
-        'INNER JOIN  ' +
-        '( ' +
-        'SELECT  ' +
-        'max(sv.semaine_version) as version ' +
-        'from interclub_semaine_version sv ' +
-        'where ' +
-        'sv.semaine_id = ' + semaineId +
-        ') AS t ' +
-        'on isv.semaine_id = ' + semaineId + ' and semaine_version = t.version '  
-        );
-
-        return rawData;
-    }
+        return null;
+    }   
 }

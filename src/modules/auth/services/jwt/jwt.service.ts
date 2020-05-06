@@ -57,7 +57,7 @@ export class JwtService {
       const payload = jwt.verify(token, JWT_CONFIG.jwtSecret) as any;
       logger.debug('verify access via payload', payload);
 
-      const user = await this.userRepositoryService.findById(payload.sub._id);
+      const user = await this.userRepositoryService.findUserById(payload.sub._id);
 
       if (!user) {
         if (isWs) {

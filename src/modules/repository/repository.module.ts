@@ -19,7 +19,11 @@ import { parametreProvider } from './parametre/parametre.providers';
 import { AuthRoleRepositoryService } from './user/services/auth-role-repository/auth-role-repository/auth-role-repository.service';
 import { AuthGroupRoleRepositoryService } from './user/services/auth-group-role-repository/auth-group-role-repository.service';
 import { InterclubsRepositoryService } from './interclubs/services/interclubs-repository.service';
-import { interclubsSemaineProvider, interclubsCategoryProvider, interclubsDivisionProvider, interclubsTeamProvider, interclubsMatchProvider, interclubsLdfParticipantProvider, interclubsLdfByCategoryProvider, interclubsSemaineVersionProvider } from './interclubs/interclubs.providers';
+
+import { interclubsSemaineProvider, interclubsCategoryProvider, interclubsDivisionProvider, interclubsTeamProvider, interclubsMatchProvider, 
+    interclubsLdfParticipantProvider, interclubsLdfByCategoryProvider, interclubsSemaineVersionProvider } from './interclubs/interclubs.providers';
+import { EntrainementRepositoryService } from './entrainement/services/entrainement-repository/entrainement-repository.service';
+import { entrainementClasseProvider } from './entrainement/entrainement.providers';
 
 @Module({
   imports: [
@@ -39,6 +43,7 @@ import { interclubsSemaineProvider, interclubsCategoryProvider, interclubsDivisi
     AfttRepositoryService,
     ParametreRepositoryService,
     InterclubsRepositoryService,
+    EntrainementRepositoryService,
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
@@ -59,6 +64,8 @@ import { interclubsSemaineProvider, interclubsCategoryProvider, interclubsDivisi
     InterclubsRepositoryService, ...interclubsSemaineProvider, ...interclubsCategoryProvider, 
       ...interclubsDivisionProvider, ...interclubsTeamProvider, ...interclubsMatchProvider,
       ...interclubsLdfParticipantProvider, ...interclubsLdfByCategoryProvider, ...interclubsSemaineVersionProvider,
+      
+    EntrainementRepositoryService, ...entrainementClasseProvider,
   ],
 })
 export class RepositoryModule {}

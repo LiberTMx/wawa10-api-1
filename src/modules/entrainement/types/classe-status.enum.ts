@@ -1,4 +1,4 @@
-export enum NewsStatusType
+export enum ClasseStatusType
 {
     VISIBLE='Visible',
     CACHEE='Cachee',
