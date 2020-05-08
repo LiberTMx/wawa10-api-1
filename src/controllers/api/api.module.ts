@@ -18,6 +18,8 @@ import { InterclubsApiController } from './interclubs-api/interclubs-api.control
 import { InterclubsModule } from '../../modules/interclubs/interclubs.module';
 import { EntrainementApiController } from './entrainement-api/entrainement-api.controller';
 import { EntrainementModule } from '../../modules/entrainement/entrainement.module';
+import { PeriodeApiController } from './periode-api/periode-api.controller';
+import { PeriodeModule } from '../../modules/periode/periode.module';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { EntrainementModule } from '../../modules/entrainement/entrainement.modu
     ParametreModule,
     InterclubsModule,
     EntrainementModule,
+    PeriodeModule,
   ],
   controllers: [
     AuthApiController,
@@ -44,6 +47,7 @@ import { EntrainementModule } from '../../modules/entrainement/entrainement.modu
     RoiApiController,
     InterclubsApiController,
     EntrainementApiController,
+    PeriodeApiController,
   ],
   providers: [
   ],

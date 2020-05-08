@@ -1,4 +1,4 @@
-create table interclubs_semeine_version
+create table interclubs_semaine_version
 (
   id INT NOT NULL AUTO_INCREMENT ,
   semaine_id int not null,
