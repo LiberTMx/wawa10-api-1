@@ -674,4 +674,9 @@ export class AuthService
 
       return this.userRepositoryService.saveUser(user);
     }
+
+    async getComite(): Promise<AuthUserEntity[]>
+    {
+      return await this.userRepositoryService.getComite();
+    }
 }

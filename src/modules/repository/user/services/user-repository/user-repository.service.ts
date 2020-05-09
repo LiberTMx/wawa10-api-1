@@ -193,4 +193,12 @@ export class UserRepositoryService
         return this.userRepository.save(user);
     }
 
+    async getComite(): Promise<AuthUserEntity[]>
+    {
+        const users=this.userRepository.createQueryBuilder('authUser')
+            .leftJoinAndSelect('authUser.fonctions', 'auth_fonction')
+            .where('authUser.membreComite = 1')
+            .getMany();
+        return users;
+    }
 }
