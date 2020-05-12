@@ -1,3 +1,4 @@
+
 create table interclubs_semaine_version
 (
   id INT NOT NULL AUTO_INCREMENT ,

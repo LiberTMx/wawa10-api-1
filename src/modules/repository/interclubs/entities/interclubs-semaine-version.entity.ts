@@ -8,6 +8,7 @@ export class InterclubsSemaineVersionEntity
     id: number;
 
     @Column({name: 'semaine_id'})
+
     // tslint:disable-next-line:variable-name
     semaine_id: number; // tinyint(2) unsigned NOT NULL,  -- FK
     
@@ -19,3 +20,4 @@ export class InterclubsSemaineVersionEntity
     // tslint:disable-next-line:variable-name
     semaine_version_statut: string; // varchar(5),
 }
+

@@ -8,11 +8,13 @@ import { InterclubsLdfByCategoryEntity } from '../../repository/interclubs/entit
 import { InterclubsRepositoryService } from '../../repository/interclubs/services/interclubs-repository.service';
 import { InterclubsSemaineEntity } from '../../repository/interclubs/entities/interclubs-semaine.entity';
 import { InterclubsCategoryEntity } from '../../repository/interclubs/entities/interclubs-category.entity';
+
 import { InterclubsSemaineVersionEntity } from '../../repository/interclubs/entities/interclubs-semaine-version.entity';
 
 import * as log4js from 'log4js';
 import { plainToClass } from 'class-transformer';
 const logger = log4js.getLogger('InterclubsService');
+
 
 @Injectable()
 export class InterclubsService 
@@ -73,7 +75,7 @@ export class InterclubsService
         return this.interclubsRepositoryService.getInterclubsLDFByCategory();
     }
 
-    async getSemaineNextVersion(semaineId: number): Promise< InterclubsSemaineVersionEntity >
+    async getSemaineNextVersion(semaineId: number): Promise< InterclubsSemaineVersionEntity[] >
     {
         /*const semaineVersion: InterclubsSemaineVersionEntity*/ 
         const rawData= await this.interclubsRepositoryService.getLastSemaineVersion(semaineId);
@@ -87,15 +89,11 @@ export class InterclubsService
                 newSemaineVersion.semaine_id=semaineId;
                 newSemaineVersion.semaine_version=1;
                 newSemaineVersion.semaine_version_statut='working';
-                return this.interclubsRepositoryService.saveSemaineVersion(newSemaineVersion);
+                await this.interclubsRepositoryService.saveSemaineVersion(newSemaineVersion);
+                return this.getSemaineVersions(semaineId);
             }
             else
             {
-                //const semaineVersion: InterclubsSemaineVersionEntity=rawData[0];
-                
-  /*               semaineVersion.id=undefined;
-                semaineVersion.semaineVersion++;
-                semaineVersion.semaineVersionStatut='working'; */
                 const vv = plainToClass(InterclubsSemaineVersionEntity, rawData[0]);
                 logger.debug('last semaine version', vv);
                 let newSemaineVersion = new InterclubsSemaineVersionEntity();
@@ -106,10 +104,16 @@ export class InterclubsService
                 newSemaineVersion =  await this.interclubsRepositoryService.saveSemaineVersion(newSemaineVersion);
                 vv.semaine_version_statut = 'closed';
                 await this.interclubsRepositoryService.saveSemaineVersion(vv);
-                return newSemaineVersion;
+                return this.getSemaineVersions(semaineId);
             }
         }
 
         return null;
     }   
+    
+    async getSemaineVersions(semaineId: number):Promise< InterclubsSemaineVersionEntity[]>
+    {
+        return this.interclubsRepositoryService.getSemaineVersions(semaineId);
+    }
 }
+
