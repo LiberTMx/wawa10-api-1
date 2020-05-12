@@ -60,13 +60,19 @@ export class InterclubsApiController {
         return this.interclubsService.getInterclubsLDFByCategory();
     }
 
-
     @Get('semaineNextVersion/:semaineId')
-    async getSemaineNextVersion(@Request() req): Promise< InterclubsSemaineVersionEntity >
+    async getSemaineNextVersion(@Request() req): Promise< InterclubsSemaineVersionEntity[] >
     {
         const semaineId = req.params.semaineId;
         return await this.interclubsService.getSemaineNextVersion(semaineId);
     }
 
+    // const apiUrl=`${environment.apiUrl}/interclubs/semaineVersions/${semaine.id}`;
+    @Get('semaineVersions/:semaineId')
+    async getSemaineVersions(@Request() req): Promise< InterclubsSemaineVersionEntity[] >
+    {
+        const semaineId = req.params.semaineId;
+        return await this.interclubsService.getSemaineVersions(semaineId);
+    }
 
 }

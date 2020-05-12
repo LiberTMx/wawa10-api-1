@@ -37,7 +37,7 @@ export class InterclubsRepositoryService
         private readonly interclubsLdfByCategoryRepository: BaseRepository<InterclubsLdfByCategoryEntity>,
 
         @Inject('interclubsSemaineVersionRepositoryToken')
-        private readonly interclubsSemaineVersionProvider: BaseRepository<InterclubsSemaineEntity>,
+        private readonly interclubsSemaineVersionProvider: BaseRepository<InterclubsSemaineVersionEntity>,
 
     ) {}
 
@@ -200,5 +200,12 @@ export class InterclubsRepositoryService
     async saveSemaineVersion(semaineVersion: InterclubsSemaineVersionEntity): Promise< InterclubsSemaineVersionEntity >
     {
         return this.interclubsSemaineVersionProvider.save(semaineVersion);
+    }
+
+    async getSemaineVersions(semaineId: number): Promise< InterclubsSemaineVersionEntity[]>
+    {
+        return this.interclubsSemaineVersionProvider.createQueryBuilder('sv')
+            .where('sv.semaine_id = :semaineId', { semaineId: semaineId})
+            .getMany();
     }
 }
