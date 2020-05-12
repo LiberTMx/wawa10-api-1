@@ -14,4 +14,7 @@ export class AuthDomainEntity {
 
     @Column({name: 'show_ordre'})
     showOrdre: number;
+
+    @Column()
+    activity: string;
 }

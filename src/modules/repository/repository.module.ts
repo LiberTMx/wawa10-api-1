@@ -23,7 +23,9 @@ import { InterclubsRepositoryService } from './interclubs/services/interclubs-re
 import { interclubsSemaineProvider, interclubsCategoryProvider, interclubsDivisionProvider, interclubsTeamProvider, interclubsMatchProvider, 
     interclubsLdfParticipantProvider, interclubsLdfByCategoryProvider, interclubsSemaineVersionProvider } from './interclubs/interclubs.providers';
 import { EntrainementRepositoryService } from './entrainement/services/entrainement-repository/entrainement-repository.service';
-import { entrainementClasseProvider } from './entrainement/entrainement.providers';
+import { entrainementClasseProvider, entrainementClasseGroupeProvider, entrainementGroupeSeanceProvider } from './entrainement/entrainement.providers';
+import { PeriodeRepositoryService } from './periode/services/periode-repository/periode-repository.service';
+import { periodeProvider } from './periode/periode.providers';
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { entrainementClasseProvider } from './entrainement/entrainement.provider
     ParametreRepositoryService,
     InterclubsRepositoryService,
     EntrainementRepositoryService,
+    PeriodeRepositoryService,
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,
@@ -65,7 +68,9 @@ import { entrainementClasseProvider } from './entrainement/entrainement.provider
       ...interclubsDivisionProvider, ...interclubsTeamProvider, ...interclubsMatchProvider,
       ...interclubsLdfParticipantProvider, ...interclubsLdfByCategoryProvider, ...interclubsSemaineVersionProvider,
       
-    EntrainementRepositoryService, ...entrainementClasseProvider,
+    EntrainementRepositoryService, ...entrainementClasseProvider, ...entrainementClasseGroupeProvider, ...entrainementGroupeSeanceProvider,
+    
+    PeriodeRepositoryService, ...periodeProvider,
   ],
 })
 export class RepositoryModule {}

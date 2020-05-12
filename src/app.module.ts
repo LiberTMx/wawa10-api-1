@@ -17,6 +17,7 @@ import { StatusModule } from './modules/status/status.module';
 import { RoiModule } from './modules/roi/roi.module';
 import { InterclubsModule } from './modules/interclubs/interclubs.module';
 import { EntrainementModule } from './modules/entrainement/entrainement.module';
+import { PeriodeModule } from './modules/periode/periode.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { EntrainementModule } from './modules/entrainement/entrainement.module';
     RoiModule,
     InterclubsModule,
     EntrainementModule,
+    PeriodeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

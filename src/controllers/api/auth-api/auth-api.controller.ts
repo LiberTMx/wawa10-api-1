@@ -321,4 +321,20 @@ export class AuthApiController
     logger.debug('reactivatedUser user:', reactivatedUser);
     return reactivatedUser;
   }
+
+  @Get('comite')
+  async getComite(): Promise<AuthUserEntity[]>
+  {
+      const users=await this.authService.getComite();
+      if(users!==null && users!==undefined && users.length>0)
+      {
+        // remove password !
+        for(const u of users)
+        {
+          u.password=null;
+        }
+      }
+      return users;
+  }
+
 }

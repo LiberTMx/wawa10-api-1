@@ -633,6 +633,30 @@ export class AuthService
       return false;
     }
 
+    async verifyUserIsStageAdmin(user: AuthUserEntity): Promise<boolean>
+    {
+      const roles: AuthRoleEntity[] = await this.getUserRoles(user);
+      if(roles===null || roles===undefined) return false;
+
+      for(const r of roles)
+      {
+        if(r.role === 'admin' && r.authDomain.domain==='stage') return true;
+      }
+      return false;
+    }
+
+    async verifyUserIsEntrainementAdmin(user: AuthUserEntity): Promise<boolean>
+    {
+      const roles: AuthRoleEntity[] = await this.getUserRoles(user);
+      if(roles===null || roles===undefined) return false;
+
+      for(const r of roles)
+      {
+        if(r.role === 'admin' && r.authDomain.domain==='entrainement') return true;
+      }
+      return false;
+    }
+
     async resetUserPassword(userId: number): Promise<AuthUserEntity>
     {
       // return await this.userRepositoryService.resetUserPassword(userId); 
@@ -649,5 +673,10 @@ export class AuthService
       user.mustChangePassword=true;
 
       return this.userRepositoryService.saveUser(user);
+    }
+
+    async getComite(): Promise<AuthUserEntity[]>
+    {
+      return await this.userRepositoryService.getComite();
     }
 }
