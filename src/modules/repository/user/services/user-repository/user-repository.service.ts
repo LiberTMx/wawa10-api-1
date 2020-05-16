@@ -198,6 +198,7 @@ export class UserRepositoryService
         const users=this.userRepository.createQueryBuilder('authUser')
             .leftJoinAndSelect('authUser.fonctions', 'auth_fonction')
             .where('authUser.membreComite = 1')
+            .andWhere('authUser.deletedAt is null ')
             .getMany();
         return users;
     }
