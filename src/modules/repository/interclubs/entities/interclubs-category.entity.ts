@@ -27,4 +27,7 @@ export class InterclubsCategoryEntity
 
     @Column()
     order: number;
+
+    @Column()
+    synonyme: string;
 }
