@@ -9,7 +9,7 @@ import * as log4js from 'log4js';
 const logger = log4js.getLogger('JwtService');
 
 export const JWT_CONFIG = {
-  accessTokenExpires: '1h',
+  // accessTokenExpires: '1h',
   refreshTokenExpires: '18h',
   jwtSecret: 'MyS3cr3tK3YForLiwA2',
   jwtSession: {
@@ -36,9 +36,13 @@ export class JwtService {
       },
       iss: os.hostname(),
     };
+    /*
     const accessToken = await jwt.sign(payload, JWT_CONFIG.jwtSecret, {
       expiresIn: JWT_CONFIG.accessTokenExpires,
     });
+    */
+    const accessToken = await jwt.sign(payload, JWT_CONFIG.jwtSecret);
+    
     const refreshToken = await jwt.sign(payload, JWT_CONFIG.jwtSecret, {
       expiresIn: JWT_CONFIG.refreshTokenExpires,
     });

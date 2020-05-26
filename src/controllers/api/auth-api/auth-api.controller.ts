@@ -294,13 +294,14 @@ export class AuthApiController
     const userId=req.body.userId;
     logger.debug('logically deleting user - id: '+userId);
     const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
-    const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+    const isUserClubAdmin=await this.authService.verifyUserIsClubAdmain(connectedUser);
     logger.debug('Connected user:'+connectedUser.username+', is club admin:'+isUserClubAdmin);
 
     if (connectedUser === null || ! isUserClubAdmin) {
       throw new BadRequestException('Unauthorized access');
     }
-    await this.authService.resetUserPassword(userId);
+    const user: AuthUserEntity=await this.authService.resetUserPassword(userId);
+    logger.info('Password reset done for user:'+ user.username + ' by: ' + connectedUser.username);
     return new ResponseMessage('ok', '200');
   }
 
