@@ -217,7 +217,7 @@ export class AuthService
       if(credential===null || credential===undefined)
       {
 
-        if(currentUser.password === credentials.password)
+        //if(currentUser.password === credentials.password)
         {
           // ok on peut créer le credential
           return await this.credentialRepositoryService.createCredential(credentials.username, credentials.password);
@@ -669,6 +669,8 @@ export class AuthService
       }
 
       // password par defaut: newLiwaUserPwd
+      //             6fd65094fbfce71dd68b619ad8cbbacf7d08c7d9f6d9b33468e59134b5288f00
+      // ovh:        6fd65094fbfce71dd68b619ad8cbbacf7d08c7d9f6d9b33468e59134b5288f00
       user.password='6fd65094fbfce71dd68b619ad8cbbacf7d08c7d9f6d9b33468e59134b5288f00';
       user.mustChangePassword=true;
 
