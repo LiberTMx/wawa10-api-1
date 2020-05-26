@@ -13,6 +13,9 @@ import { InterclubsSemaineVersionEntity } from '../../repository/interclubs/enti
 
 import * as log4js from 'log4js';
 import { plainToClass } from 'class-transformer';
+import { CreateSelectionDTO } from 'src/shared/dto/interclubs/create-selection.dto';
+import { InterclubsSelectionEntity } from 'src/modules/repository/interclubs/entities/interclubs-selection.entity';
+import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
 const logger = log4js.getLogger('InterclubsService');
 
 
@@ -114,6 +117,61 @@ export class InterclubsService
     async getSemaineVersions(semaineId: number):Promise< InterclubsSemaineVersionEntity[]>
     {
         return this.interclubsRepositoryService.getSemaineVersions(semaineId);
+    }
+
+    async storeSelection(createSelectionDTO: CreateSelectionDTO, connectedUser: AuthUserEntity): Promise<InterclubsSelectionEntity>
+    {
+        //find any existing entity at same position
+        const existingSelection =  await this.interclubsRepositoryService.findSelection(
+            createSelectionDTO.match.MatchId,
+            createSelectionDTO.version.id,
+            createSelectionDTO.position
+        );
+        if(existingSelection!==null && existingSelection!==undefined)
+        {
+            existingSelection.auth_user_id = createSelectionDTO.selection.participant.authUserId;
+            existingSelection.classement = createSelectionDTO.selection.listeDeForce.classement;
+            existingSelection.ranking_index = createSelectionDTO.selection.listeDeForce.rankingIndex;
+            existingSelection.joueur_confirmation = "";
+            existingSelection.joueur_commentaire = "";
+            existingSelection.updated_at = new Date();
+            existingSelection.updated_by = connectedUser.id;
+            return this.interclubsRepositoryService.storeSelection(existingSelection);
+        }
+
+        const selection: InterclubsSelectionEntity = new InterclubsSelectionEntity();
+
+        selection.interclubs_match_id = createSelectionDTO.match.MatchId;
+        selection.auth_user_id = createSelectionDTO.selection.participant.authUserId;
+        selection.interclubs_semaine_version_id = createSelectionDTO.version.id;
+        selection.position = createSelectionDTO.position;
+        selection.classement = createSelectionDTO.selection.listeDeForce.classement;
+        selection.ranking_index = createSelectionDTO.selection.listeDeForce.rankingIndex;
+        selection.joueur_confirmation = "";
+        selection.joueur_commentaire = "";
+        selection.updated_at = new Date();
+        selection.updated_by = connectedUser.id;
+
+        return this.interclubsRepositoryService.storeSelection(selection);
+    }
+
+    async getSelectionForMatch(matchId: string, versionId: number):Promise< InterclubsSelectionEntity[]>
+    {
+        return this.interclubsRepositoryService.getSelectionForMatch(matchId,versionId);
+    }
+
+    async deleteSelection(deleteSelectionDTO, connectedUser)
+    {
+        const existingSelection =  await this.interclubsRepositoryService.findSelection(
+            deleteSelectionDTO.match.MatchId,
+            deleteSelectionDTO.version.id,
+            deleteSelectionDTO.position
+        );
+
+        if(existingSelection!==null && existingSelection!==undefined)
+        {
+            return this.interclubsRepositoryService.delete(existingSelection);
+        }
     }
 }
 
