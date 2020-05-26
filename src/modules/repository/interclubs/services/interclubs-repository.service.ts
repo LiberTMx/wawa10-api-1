@@ -10,6 +10,8 @@ import { AfttMatchEntity } from '../../aftt/entities/aftt-match.entity';
 import { InterclubsLdfParticipantEntity } from '../entities/interclubs-ldf-participant.entity';
 import { InterclubsLdfByCategoryEntity } from '../entities/interclubs-ldf-by-category.entity';
 import { InterclubsSemaineVersionEntity } from '../entities/interclubs-semaine-version.entity';
+import { CreateSelectionDTO } from 'src/shared/dto/interclubs/create-selection.dto';
+import { InterclubsSelectionEntity } from '../entities/interclubs-selection.entity';
 
 @Injectable()
 export class InterclubsRepositoryService 
@@ -38,6 +40,9 @@ export class InterclubsRepositoryService
 
         @Inject('interclubsSemaineVersionRepositoryToken')
         private readonly interclubsSemaineVersionProvider: BaseRepository<InterclubsSemaineVersionEntity>,
+
+        @Inject('interclubsSelectionRepositoryToken')
+        private readonly interclubsSelectionProvider: BaseRepository<InterclubsSelectionEntity>,
 
     ) {}
 
@@ -207,5 +212,32 @@ export class InterclubsRepositoryService
         return this.interclubsSemaineVersionProvider.createQueryBuilder('sv')
             .where('sv.semaine_id = :semaineId', { semaineId: semaineId})
             .getMany();
+    }
+
+    async storeSelection(selection: InterclubsSelectionEntity): Promise<InterclubsSelectionEntity>
+    {
+        return this.interclubsSelectionProvider.save(selection);
+    }
+
+    async findSelection(matchId: string, versionId: number, position: number): Promise<InterclubsSelectionEntity>
+    {
+        return this.interclubsSelectionProvider.createQueryBuilder('sel')
+        .where('sel.interclubs_match_id = :pMatchId', { pMatchId: matchId})
+        .andWhere('sel.interclubs_semaine_version_id = :pVersionId', { pVersionId: versionId})
+        .andWhere('sel.position = :pPosition', { pPosition: position})
+        .getOne();
+    }
+
+    async getSelectionForMatch(matchId: string, versionId: number):Promise< InterclubsSelectionEntity[]>
+    {
+        return this.interclubsSelectionProvider.createQueryBuilder('sel')
+        .where('sel.interclubs_match_id = :pMatchId', { pMatchId: matchId})
+        .andWhere('sel.interclubs_semaine_version_id = :pVersionId', { pVersionId: versionId})
+        .getMany();
+    }
+
+    async delete(existingSelection: InterclubsSelectionEntity)
+    {
+        this.interclubsSelectionProvider.remove(existingSelection);
     }
 }

@@ -7,6 +7,7 @@ import { InterclubsMatchEntity } from './entities/interclubs-match.entity';
 import { InterclubsLdfParticipantEntity } from './entities/interclubs-ldf-participant.entity';
 import { InterclubsLdfByCategoryEntity } from './entities/interclubs-ldf-by-category.entity';
 import { InterclubsSemaineVersionEntity } from './entities/interclubs-semaine-version.entity';
+import { InterclubsSelectionEntity } from './entities/interclubs-selection.entity';
 
 // interclubsEntity
 /* export const interclubsProvider = [
@@ -83,6 +84,15 @@ export const interclubsSemaineVersionProvider = [
   {
     provide: 'interclubsSemaineVersionRepositoryToken',
     useFactory: (connection: Connection) => connection.getRepository(InterclubsSemaineVersionEntity), 
+    inject: ['DbConnectionToken'],
+  },
+];
+
+// InterclubsSelectionEntity
+export const interclubsSelectionProvider = [
+  {
+    provide: 'interclubsSelectionRepositoryToken',
+    useFactory: (connection: Connection) => connection.getRepository(InterclubsSelectionEntity), 
     inject: ['DbConnectionToken'],
   },
 ];

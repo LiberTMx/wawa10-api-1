@@ -21,7 +21,7 @@ import { AuthGroupRoleRepositoryService } from './user/services/auth-group-role-
 import { InterclubsRepositoryService } from './interclubs/services/interclubs-repository.service';
 
 import { interclubsSemaineProvider, interclubsCategoryProvider, interclubsDivisionProvider, interclubsTeamProvider, interclubsMatchProvider, 
-    interclubsLdfParticipantProvider, interclubsLdfByCategoryProvider, interclubsSemaineVersionProvider } from './interclubs/interclubs.providers';
+    interclubsLdfParticipantProvider, interclubsLdfByCategoryProvider, interclubsSemaineVersionProvider, interclubsSelectionProvider } from './interclubs/interclubs.providers';
 import { EntrainementRepositoryService } from './entrainement/services/entrainement-repository/entrainement-repository.service';
 import { entrainementClasseProvider, entrainementClasseGroupeProvider, entrainementGroupeSeanceProvider } from './entrainement/entrainement.providers';
 import { PeriodeRepositoryService } from './periode/services/periode-repository/periode-repository.service';
@@ -67,6 +67,7 @@ import { periodeProvider } from './periode/periode.providers';
     InterclubsRepositoryService, ...interclubsSemaineProvider, ...interclubsCategoryProvider, 
       ...interclubsDivisionProvider, ...interclubsTeamProvider, ...interclubsMatchProvider,
       ...interclubsLdfParticipantProvider, ...interclubsLdfByCategoryProvider, ...interclubsSemaineVersionProvider,
+      ...interclubsSelectionProvider,
       
     EntrainementRepositoryService, ...entrainementClasseProvider, ...entrainementClasseGroupeProvider, ...entrainementGroupeSeanceProvider,
     
