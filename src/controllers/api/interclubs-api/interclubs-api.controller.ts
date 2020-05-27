@@ -15,6 +15,7 @@ import { InterclubsSelectionEntity } from 'src/modules/repository/interclubs/ent
 import { AuthService } from 'src/modules/auth/services/auth/auth.service';
 import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
 import { DeleteSelectionDTO } from 'src/shared/dto/interclubs/delete-selection.dto';
+import { PublishSelectionDTO } from 'src/shared/dto/interclubs/publish-selection.dto';
 const logger = log4js.getLogger('InterclubsApiController');
 
 @Controller('interclubs')
@@ -74,6 +75,12 @@ export class InterclubsApiController {
     {
         const semaineId = req.params.semaineId;
         return await this.interclubsService.getSemaineNextVersion(semaineId);
+    }
+
+    @Get('publishedInterclubsSemaines')
+    async getPublishedInterclubsSemaines(@Request() req): Promise< InterclubsSemaineVersionEntity[] >
+    {
+        return await this.interclubsService.getPublishedInterclubsSemaines();
     }
 
     // const apiUrl=`${environment.apiUrl}/interclubs/semaineVersions/${semaine.id}`;
@@ -142,4 +149,17 @@ export class InterclubsApiController {
         return new ResponseMessage('ok', '200');
     }
 
+    @Post('publishSemaineVersion')
+    async publishSemaineVersion(@Request() req, @Body() publishSelectionDTO: PublishSelectionDTO, @Headers() headers): Promise< InterclubsSemaineVersionEntity >
+    {
+        const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+        const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+        if (connectedUser === null || ! isUserClubAdmin) {
+            throw new BadRequestException('Unauthorized access');
+        }
+
+        publishSelectionDTO.version = JSON.parse(publishSelectionDTO.version);
+        logger.debug('publish selection for version', publishSelectionDTO);
+        return await this.interclubsService.publishSemaineVersion(publishSelectionDTO, connectedUser);
+    }
 }
