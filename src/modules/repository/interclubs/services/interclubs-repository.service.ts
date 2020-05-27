@@ -207,10 +207,32 @@ export class InterclubsRepositoryService
         return this.interclubsSemaineVersionProvider.save(semaineVersion);
     }
 
+    async getSemaineVersionById(id: number): Promise< InterclubsSemaineVersionEntity>
+    {
+        return this.interclubsSemaineVersionProvider.createQueryBuilder('sv')
+            .where('sv.id = :Id', { Id: id})
+            .getOne();
+    }
+
     async getSemaineVersions(semaineId: number): Promise< InterclubsSemaineVersionEntity[]>
     {
         return this.interclubsSemaineVersionProvider.createQueryBuilder('sv')
             .where('sv.semaine_id = :semaineId', { semaineId: semaineId})
+            .getMany();
+    }
+
+    async getWorkigSemaineVersion(semaineId: number): Promise< InterclubsSemaineVersionEntity[]>
+    {
+        return this.interclubsSemaineVersionProvider.createQueryBuilder('sv')
+            .where('sv.semaine_id = :semaineId', { semaineId: semaineId})
+            .andWhere('sv.semaine_version_statut = :status', { status: 'working'})
+            .getMany();
+    }
+
+    async getPublishedInterclubsSemaines(): Promise< InterclubsSemaineVersionEntity[]>
+    {
+        return this.interclubsSemaineVersionProvider.createQueryBuilder('sv')
+            .where('sv.semaine_version_statut = :status', { status: 'published'})
             .getMany();
     }
 
@@ -240,4 +262,5 @@ export class InterclubsRepositoryService
     {
         this.interclubsSelectionProvider.remove(existingSelection);
     }
+
 }
