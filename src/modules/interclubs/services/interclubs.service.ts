@@ -16,6 +16,8 @@ import { plainToClass } from 'class-transformer';
 import { CreateSelectionDTO } from 'src/shared/dto/interclubs/create-selection.dto';
 import { InterclubsSelectionEntity } from 'src/modules/repository/interclubs/entities/interclubs-selection.entity';
 import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
+import { DeleteSelectionDTO } from 'src/shared/dto/interclubs/delete-selection.dto';
+import { PublishSelectionDTO } from 'src/shared/dto/interclubs/publish-selection.dto';
 const logger = log4js.getLogger('InterclubsService');
 
 
@@ -114,6 +116,11 @@ export class InterclubsService
         return null;
     }   
     
+    async getPublishedInterclubsSemaines(): Promise< InterclubsSemaineVersionEntity[] >
+    {
+        return this.interclubsRepositoryService.getPublishedInterclubsSemaines();
+    }
+
     async getSemaineVersions(semaineId: number):Promise< InterclubsSemaineVersionEntity[]>
     {
         return this.interclubsRepositoryService.getSemaineVersions(semaineId);
@@ -160,7 +167,7 @@ export class InterclubsService
         return this.interclubsRepositoryService.getSelectionForMatch(matchId,versionId);
     }
 
-    async deleteSelection(deleteSelectionDTO, connectedUser)
+    async deleteSelection(deleteSelectionDTO: DeleteSelectionDTO, connectedUser: AuthUserEntity)
     {
         const existingSelection =  await this.interclubsRepositoryService.findSelection(
             deleteSelectionDTO.match.MatchId,
@@ -172,6 +179,13 @@ export class InterclubsService
         {
             return this.interclubsRepositoryService.delete(existingSelection);
         }
+    }
+
+    async publishSemaineVersion(publishSelectionDTO: PublishSelectionDTO, connectedUser: AuthUserEntity): Promise< InterclubsSemaineVersionEntity >
+    {
+        const workingVersion: InterclubsSemaineVersionEntity = await this.interclubsRepositoryService.getSemaineVersionById(publishSelectionDTO.version.id);
+        workingVersion.semaine_version_statut='published';
+        return this.interclubsRepositoryService.saveSemaineVersion(workingVersion);
     }
 }
 
