@@ -20,4 +20,3 @@ export class InterclubsSemaineVersionEntity
     // tslint:disable-next-line:variable-name
     semaine_version_statut: string; // varchar(5),
 }
-

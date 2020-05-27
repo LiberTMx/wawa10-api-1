@@ -126,4 +126,10 @@ export class AuthUserEntity
             },*/
         )
     fonctions: AuthFonctionEntity[];
+
+    @Column({name: 'aftt_player_status'})
+    afttPlayerStatus: string;
+
+    @Column({name: 'aftt_player_category'})
+    afttPlayerCategory: string;
 }
