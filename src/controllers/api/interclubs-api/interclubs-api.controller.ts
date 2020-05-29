@@ -16,6 +16,7 @@ import { AuthService } from 'src/modules/auth/services/auth/auth.service';
 import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
 import { DeleteSelectionDTO } from 'src/shared/dto/interclubs/delete-selection.dto';
 import { PublishSelectionDTO } from 'src/shared/dto/interclubs/publish-selection.dto';
+import { LdfParticipantDTO } from '../../../shared/dto/interclubs/ldf-participant.dto';
 const logger = log4js.getLogger('InterclubsApiController');
 
 @Controller('interclubs')
@@ -161,5 +162,23 @@ export class InterclubsApiController {
         publishSelectionDTO.version = JSON.parse(publishSelectionDTO.version);
         logger.debug('publish selection for version', publishSelectionDTO);
         return await this.interclubsService.publishSemaineVersion(publishSelectionDTO, connectedUser);
+    }
+
+    @Post('updateLdfParticipant')
+    async updateLdfParticipant(@Request() req, @Body() participant: LdfParticipantDTO, @Headers() headers): Promise< InterclubsLdfParticipantEntity >
+    {
+        const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+        const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+        if (connectedUser === null || ! isUserClubAdmin) {
+            throw new BadRequestException('Unauthorized access');
+        }
+
+        logger.debug('updateLdfParticipant', participant);
+
+        participant=JSON.parse(participant.participant);
+        if(participant===null || participant===undefined) return null;
+
+        return await this.interclubsService.updateLdfParticipant(participant, connectedUser);
+
     }
 }

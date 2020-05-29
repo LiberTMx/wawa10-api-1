@@ -356,6 +356,11 @@ export class AuthService
       return await this.userRepositoryService.findUserById(userId);
     }
     
+    async getUserByLicence(licence: string): Promise<AuthUserEntity>
+    {
+      return await this.userRepositoryService.getUserByLicence(licence);
+    }
+
     async getAllUserFonction(): Promise<AuthFonctionEntity[]>
     {
       return await this.userRepositoryService.getAllUserFonction();
