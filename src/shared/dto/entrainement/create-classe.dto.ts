@@ -14,6 +14,8 @@ import { ClasseStatusType } from '../../../modules/entrainement/types/classe-sta
 */
 export class CreateClasseDTO {
 
+    id: number;
+    
     /*
     const postData = new FormData();
         postData.append('title' , classeFormValue.title );

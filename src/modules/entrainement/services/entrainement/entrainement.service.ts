@@ -24,6 +24,21 @@ export class EntrainementService
         return await this.entrainementRepositoryService.saveClasse(classe);
     }
 
+    async updateClasse(updateClasseDTO: CreateClasseDTO, connectedUser: AuthUserEntity): Promise<EntrainementClasseEntity>
+    {
+        const classe: EntrainementClasseEntity =  await this.getEntrainementClasseById(updateClasseDTO.id);
+        classe.externalLink=updateClasseDTO.externalLink;
+        classe.imageFilename=updateClasseDTO.imageFilename;
+        classe.mimeType=updateClasseDTO.mimeType;
+        classe.presentation=updateClasseDTO.presentation;
+        classe.showOrder=updateClasseDTO.showOrder;
+        classe.status=updateClasseDTO.status;
+        classe.titre=updateClasseDTO.titre;
+        classe.updatedAt=new Date();
+        classe.updatedBy=connectedUser.username;
+        return await this.entrainementRepositoryService.saveClasse(classe);
+    }
+
     async createClasseGroupe(createClasseGroupeDTO: CreateClasseGroupeDTO, connectedUser: AuthUserEntity): Promise<EntrainementClasseGroupeEntity>
     {
         const groupe: EntrainementClasseGroupeEntity =  new EntrainementClasseGroupeEntity();
