@@ -16,8 +16,8 @@ import { AuthService } from 'src/modules/auth/services/auth/auth.service';
 import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
 import { DeleteSelectionDTO } from 'src/shared/dto/interclubs/delete-selection.dto';
 import { PublishSelectionDTO } from 'src/shared/dto/interclubs/publish-selection.dto';
+import { LdfParticipantDTO } from '../../../shared/dto/interclubs/ldf-participant.dto';
 const logger = log4js.getLogger('InterclubsApiController');
-
 
 @Controller('interclubs')
 export class InterclubsApiController {
@@ -97,8 +97,15 @@ export class InterclubsApiController {
     {
        /*  
           create selection CreateSelectionDTO {
-            selection: '{"participant":{"id":1,"nom":"INDEHERBERG","prenom":"JULIEN","sexe":"M","licence":"119894","authUserId":null,"statut":"A","playerCategory":"1","medicalAttestation":true},"listeDeForce":{"id":1,"participantId":1,"playerCategory":1,"position":1,"classement":"A20","rankingIndex":1}}',
-            match: `{"id":92,"MatchId":"NH01/025","WeekName":"01","matchDate":"2019-09-13T22:00:00.000Z","Time":"19:00:00","Venue":1,"HomeClub":"BBW165","HomeTeam":"Logis Auderghem A","AwayClub":"BBW123","AwayTeam":"Limal Wavre A","Score":"9-7","MatchUniqueId":387499,"IsHomeForfeited":false,"IsAwayForfeited":false,"DivisionId":4141,"DivisionCategory":"1","IsHomeWithdrawn":"N","IsAwayWithdrawn":"N","venueName":"CENTRE SPORTIF D'AUDERGHEM","venueStreet":"CHAUSSEE DE WAVRE 1690","venueTown":"1160 BRUXELLES","venuePhone":"02/672.24.21","venueComment":"","IsValidated":true,"IsLocked":true,"homeTeamId":null,"awayTeamId":"4141-9"}`,
+            selection: '{"participant":{"id":1,"nom":"INDEHERBERG","prenom":"JULIEN","sexe":"M","licence":"119894",
+            "authUserId":null,"statut":"A","playerCategory":"1","medicalAttestation":true},"listeDeForce":{"id":1,"participantId":1,
+            "playerCategory":1,"position":1,"classement":"A20","rankingIndex":1}}',
+            match: `{"id":92,"MatchId":"NH01/025","WeekName":"01","matchDate":"2019-09-13T22:00:00.000Z","Time":"19:00:00",
+            "Venue":1,"HomeClub":"BBW165","HomeTeam":"Logis Auderghem A","AwayClub":"BBW123","AwayTeam":"Limal Wavre A",
+            "Score":"9-7","MatchUniqueId":387499,"IsHomeForfeited":false,"IsAwayForfeited":false,"DivisionId":4141,
+            "DivisionCategory":"1","IsHomeWithdrawn":"N","IsAwayWithdrawn":"N","venueName":"CENTRE SPORTIF D'AUDERGHEM",
+            "venueStreet":"CHAUSSEE DE WAVRE 1690","venueTown":"1160 BRUXELLES","venuePhone":"02/672.24.21","venueComment":"",
+            "IsValidated":true,"IsLocked":true,"homeTeamId":null,"awayTeamId":"4141-9"}`,
             position: '1'
         }
         */
@@ -120,7 +127,7 @@ export class InterclubsApiController {
 
     // selectionForMatch ? matchId & versionId
     @Get('selectionForMatch')
-    async getSelectionForMatch (@Request() req, @Query() query): Promise<InterclubsSelectionEntity[]>
+    async getSelectionForMatch(@Request() req, @Query() query): Promise<InterclubsSelectionEntity[]>
     {
         const matchId = query.matchId;
         const versionId = query.versionId;
@@ -155,5 +162,23 @@ export class InterclubsApiController {
         publishSelectionDTO.version = JSON.parse(publishSelectionDTO.version);
         logger.debug('publish selection for version', publishSelectionDTO);
         return await this.interclubsService.publishSemaineVersion(publishSelectionDTO, connectedUser);
+    }
+
+    @Post('updateLdfParticipant')
+    async updateLdfParticipant(@Request() req, @Body() participant: LdfParticipantDTO, @Headers() headers): Promise< InterclubsLdfParticipantEntity >
+    {
+        const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+        const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+        if (connectedUser === null || ! isUserClubAdmin) {
+            throw new BadRequestException('Unauthorized access');
+        }
+
+        logger.debug('updateLdfParticipant', participant);
+
+        participant=JSON.parse(participant.participant);
+        if(participant===null || participant===undefined) return null;
+
+        return await this.interclubsService.updateLdfParticipant(participant, connectedUser);
+
     }
 }

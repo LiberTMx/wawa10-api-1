@@ -81,6 +81,15 @@ export class UserRepositoryService
         return user;
     }
 
+    async getUserByLicence(licence: string): Promise<AuthUserEntity>
+    {
+        const user=this.userRepository.createQueryBuilder('authUser')
+        .leftJoinAndSelect('authUser.fonctions', 'auth_fonction')
+        .where('authUser.licence = :lic', {lic: licence})
+        .getOne();
+        return user;
+    }
+
     async saveUser(user: AuthUserEntity): Promise<AuthUserEntity> 
     {
         return this.userRepository.save(user);

@@ -162,6 +162,22 @@ export class AuthApiController
       return user;
   }
 
+  // findUserByLicence
+  @Get('userByLicence/:licence')
+  async getUserByLicence(@Param() params): Promise<AuthUserEntity>
+  {
+      const licence = params.licence;
+      logger.debug('user by licence:', licence);
+      const user=await this.authService.getUserByLicence(licence);
+      
+      if(user!==null && user!==undefined)
+      {
+        // remove password !
+        user.password=null;
+      }
+      return user;
+  }
+
   @Get('fonctions')
   async getAllUserFonction(): Promise<AuthFonctionEntity[]>
   {

@@ -18,13 +18,15 @@ import { InterclubsSelectionEntity } from 'src/modules/repository/interclubs/ent
 import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
 import { DeleteSelectionDTO } from 'src/shared/dto/interclubs/delete-selection.dto';
 import { PublishSelectionDTO } from 'src/shared/dto/interclubs/publish-selection.dto';
+import { LdfParticipantDTO } from '../../../shared/dto/interclubs/ldf-participant.dto';
+import { AuthService } from '../../auth/services/auth/auth.service';
 const logger = log4js.getLogger('InterclubsService');
-
 
 @Injectable()
 export class InterclubsService 
 {
     constructor(
+        private readonly authService: AuthService,
         private readonly interclubsRepositoryService: InterclubsRepositoryService,
     ) {}
 
@@ -121,7 +123,7 @@ export class InterclubsService
         return this.interclubsRepositoryService.getPublishedInterclubsSemaines();
     }
 
-    async getSemaineVersions(semaineId: number):Promise< InterclubsSemaineVersionEntity[]>
+    async getSemaineVersions(semaineId: number): Promise< InterclubsSemaineVersionEntity[]>
     {
         return this.interclubsRepositoryService.getSemaineVersions(semaineId);
     }
@@ -132,15 +134,15 @@ export class InterclubsService
         const existingSelection =  await this.interclubsRepositoryService.findSelection(
             createSelectionDTO.match.MatchId,
             createSelectionDTO.version.id,
-            createSelectionDTO.position
+            createSelectionDTO.position,
         );
         if(existingSelection!==null && existingSelection!==undefined)
         {
             existingSelection.auth_user_id = createSelectionDTO.selection.participant.authUserId;
             existingSelection.classement = createSelectionDTO.selection.listeDeForce.classement;
             existingSelection.ranking_index = createSelectionDTO.selection.listeDeForce.rankingIndex;
-            existingSelection.joueur_confirmation = "";
-            existingSelection.joueur_commentaire = "";
+            existingSelection.joueur_confirmation = '';
+            existingSelection.joueur_commentaire = '';
             existingSelection.updated_at = new Date();
             existingSelection.updated_by = connectedUser.id;
             return this.interclubsRepositoryService.storeSelection(existingSelection);
@@ -154,15 +156,15 @@ export class InterclubsService
         selection.position = createSelectionDTO.position;
         selection.classement = createSelectionDTO.selection.listeDeForce.classement;
         selection.ranking_index = createSelectionDTO.selection.listeDeForce.rankingIndex;
-        selection.joueur_confirmation = "";
-        selection.joueur_commentaire = "";
+        selection.joueur_confirmation = '';
+        selection.joueur_commentaire = '';
         selection.updated_at = new Date();
         selection.updated_by = connectedUser.id;
 
         return this.interclubsRepositoryService.storeSelection(selection);
     }
 
-    async getSelectionForMatch(matchId: string, versionId: number):Promise< InterclubsSelectionEntity[]>
+    async getSelectionForMatch(matchId: string, versionId: number): Promise< InterclubsSelectionEntity[]>
     {
         return this.interclubsRepositoryService.getSelectionForMatch(matchId,versionId);
     }
@@ -172,7 +174,7 @@ export class InterclubsService
         const existingSelection =  await this.interclubsRepositoryService.findSelection(
             deleteSelectionDTO.match.MatchId,
             deleteSelectionDTO.version.id,
-            deleteSelectionDTO.position
+            deleteSelectionDTO.position,
         );
 
         if(existingSelection!==null && existingSelection!==undefined)
@@ -187,5 +189,23 @@ export class InterclubsService
         workingVersion.semaine_version_statut='published';
         return this.interclubsRepositoryService.saveSemaineVersion(workingVersion);
     }
-}
 
+    async updateLdfParticipant(participant: LdfParticipantDTO, connectedUser: AuthUserEntity): Promise< InterclubsLdfParticipantEntity >
+    {
+        const participantId=participant.id;
+        
+        const e: InterclubsLdfParticipantEntity = await this.interclubsRepositoryService.getInterclubsLDFParticipantById(participant.id);
+        logger.debug('update entity '+participant.id,e);
+        if(e!==null && e!==undefined)
+        {
+            logger.debug('update entity ',e);
+            e.authUserId=participant.authUserId;
+            return this.interclubsRepositoryService.saveInterclubsLdfParticipant(e);
+        }
+        else
+        {
+            logger.debug('update entity - participant not found by id', participant);   
+        }
+        return e;
+    }
+}

@@ -17,7 +17,7 @@ import { InterclubsSelectionEntity } from '../entities/interclubs-selection.enti
 export class InterclubsRepositoryService 
 {
     query(arg0: string): any {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
     constructor(
      /*    @Inject('interclubsRepositoryToken')
@@ -178,6 +178,13 @@ export class InterclubsRepositoryService
         return this.interclubsLdfParticipantRepository.find();
     }
 
+    async getInterclubsLDFParticipantById(participantId: number): Promise< InterclubsLdfParticipantEntity >
+    {
+        return this.interclubsLdfParticipantRepository.createQueryBuilder('part')
+            .where('part.id = :partId', { partId: participantId })
+            .getOne();
+    }
+
     async getInterclubsLDFByCategory(): Promise< InterclubsLdfByCategoryEntity[] >
     {
         return this.interclubsLdfByCategoryRepository.find();
@@ -217,14 +224,14 @@ export class InterclubsRepositoryService
     async getSemaineVersions(semaineId: number): Promise< InterclubsSemaineVersionEntity[]>
     {
         return this.interclubsSemaineVersionProvider.createQueryBuilder('sv')
-            .where('sv.semaine_id = :semaineId', { semaineId: semaineId})
+            .where('sv.semaine_id = :psemaineId', { psemaineId: semaineId})
             .getMany();
     }
 
     async getWorkigSemaineVersion(semaineId: number): Promise< InterclubsSemaineVersionEntity[]>
     {
         return this.interclubsSemaineVersionProvider.createQueryBuilder('sv')
-            .where('sv.semaine_id = :semaineId', { semaineId: semaineId})
+            .where('sv.semaine_id = :psemaineId', { psemaineId: semaineId})
             .andWhere('sv.semaine_version_statut = :status', { status: 'working'})
             .getMany();
     }
@@ -250,7 +257,7 @@ export class InterclubsRepositoryService
         .getOne();
     }
 
-    async getSelectionForMatch(matchId: string, versionId: number):Promise< InterclubsSelectionEntity[]>
+    async getSelectionForMatch(matchId: string, versionId: number): Promise< InterclubsSelectionEntity[]>
     {
         return this.interclubsSelectionProvider.createQueryBuilder('sel')
         .where('sel.interclubs_match_id = :pMatchId', { pMatchId: matchId})
