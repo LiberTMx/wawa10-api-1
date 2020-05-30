@@ -16,9 +16,7 @@ import { InterclubsSelectionEntity } from '../entities/interclubs-selection.enti
 @Injectable()
 export class InterclubsRepositoryService 
 {
-    query(arg0: string): any {
-        throw new Error('Method not implemented.');
-    }
+
     constructor(
      /*    @Inject('interclubsRepositoryToken')
         private readonly interclubsRepository: BaseRepository<interclubsEntity>, */
@@ -126,6 +124,13 @@ export class InterclubsRepositoryService
         return this.interclubsDivisionRepository.find();
     }
 
+    async getInterclubsDivisionByDivisionId(divisionId: number): Promise< InterclubsDivisionEntity >
+    {
+        return this.interclubsDivisionRepository.createQueryBuilder('div')
+        .where('div.DivisionId = :divId', { divId: divisionId })
+        .getOne();
+    }
+
     async getInterclubsTeams(): Promise< InterclubsTeamEntity[] >
     {
         return this.interclubsTeamRepository.find();
@@ -134,6 +139,7 @@ export class InterclubsRepositoryService
     async findInterclubsMatchByMatchId(afttMatch: AfttMatchEntity): Promise<InterclubsMatchEntity>
     {
         return this.interclubsMatchRepository.createQueryBuilder('match')
+            .leftJoinAndSelect('match.division', 'division')
             .where('match.MatchId = :matchId', { matchId: afttMatch.MatchId })
             .getOne();
     }
@@ -170,7 +176,10 @@ export class InterclubsRepositoryService
 
     async getInterclubsMatches(): Promise< InterclubsMatchEntity[] >
     {
-        return this.interclubsMatchRepository.find();
+        return this.interclubsMatchRepository.createQueryBuilder('match')
+            .leftJoinAndSelect('match.division', 'division')
+            // .where('match.MatchId = :matchId', { matchId: afttMatch.MatchId })
+            .getMany();
     }
 
     async getInterclubsLDFParticipants(): Promise< InterclubsLdfParticipantEntity[] >

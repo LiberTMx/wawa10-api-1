@@ -17,6 +17,7 @@ import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.e
 import { DeleteSelectionDTO } from 'src/shared/dto/interclubs/delete-selection.dto';
 import { PublishSelectionDTO } from 'src/shared/dto/interclubs/publish-selection.dto';
 import { LdfParticipantDTO } from '../../../shared/dto/interclubs/ldf-participant.dto';
+import { InterclubsEnrichedSelectionModel } from 'src/modules/interclubs/model/interclubs-enriched-selection.model';
 const logger = log4js.getLogger('InterclubsApiController');
 
 @Controller('interclubs')
@@ -132,6 +133,15 @@ export class InterclubsApiController {
         const matchId = query.matchId;
         const versionId = query.versionId;
         return await this.interclubsService.getSelectionForMatch(matchId, versionId);
+    }
+
+    // enrichedSelectionForMatch
+    @Get('enrichedSelectionForMatch')
+    async getEnrichedSelectionForMatch(@Request() req, @Query() query): Promise<InterclubsEnrichedSelectionModel[]>
+    {
+        const matchId = query.matchId;
+        const versionId = query.versionId;
+        return await this.interclubsService.getEnrichedSelectionForMatch(matchId, versionId);
     }
 
     @Post('deleteSelection')

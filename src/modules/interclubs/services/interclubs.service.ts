@@ -20,6 +20,7 @@ import { DeleteSelectionDTO } from 'src/shared/dto/interclubs/delete-selection.d
 import { PublishSelectionDTO } from 'src/shared/dto/interclubs/publish-selection.dto';
 import { LdfParticipantDTO } from '../../../shared/dto/interclubs/ldf-participant.dto';
 import { AuthService } from '../../auth/services/auth/auth.service';
+import { InterclubsEnrichedSelectionModel } from '../model/interclubs-enriched-selection.model';
 const logger = log4js.getLogger('InterclubsService');
 
 @Injectable()
@@ -69,7 +70,16 @@ export class InterclubsService
 
     async getInterclubsMatches(): Promise< InterclubsMatchEntity[] >
     {
-        return this.interclubsRepositoryService.getInterclubsMatches();
+        const matches = await this.interclubsRepositoryService.getInterclubsMatches();
+        if(matches!==null && matches!==undefined && matches.length>0)
+        {
+            for(const m of matches)
+            {
+                const division = await this.interclubsRepositoryService.getInterclubsDivisionByDivisionId(m.DivisionId);
+                m.division = division;
+            }
+        }
+        return matches;
     }
 
     async getInterclubsLDFParticipants(): Promise< InterclubsLdfParticipantEntity[] >
@@ -167,6 +177,24 @@ export class InterclubsService
     async getSelectionForMatch(matchId: string, versionId: number): Promise< InterclubsSelectionEntity[]>
     {
         return this.interclubsRepositoryService.getSelectionForMatch(matchId,versionId);
+    }
+
+    async getEnrichedSelectionForMatch(matchId: string, versionId: number): Promise< InterclubsEnrichedSelectionModel[]>
+    {
+        const array: InterclubsEnrichedSelectionModel[] = [];
+        
+        const selections = await this.interclubsRepositoryService.getSelectionForMatch(matchId,versionId);
+        if(selections!==null && selections!==undefined && selections.length>0)
+        {
+            for(const sel  of selections)
+            {
+                const user = await this.authService.getUserById(sel.auth_user_id);
+                array.push(
+                    new InterclubsEnrichedSelectionModel(sel, user)
+                );
+            }
+        }
+        return array;
     }
 
     async deleteSelection(deleteSelectionDTO: DeleteSelectionDTO, connectedUser: AuthUserEntity)
