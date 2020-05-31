@@ -1,4 +1,5 @@
-import { PrimaryGeneratedColumn, Column, Entity } from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity, OneToOne, JoinColumn } from 'typeorm';
+import { InterclubsDivisionEntity } from './interclubs-division.entity';
 
 @Entity({name: 'interclubs_match'})
 export class InterclubsMatchEntity
@@ -84,4 +85,16 @@ export class InterclubsMatchEntity
 
     @Column({name: 'awayTeamId'})
     awayTeamId: string;
+
+    
+    @OneToOne(type => InterclubsDivisionEntity, division => division.DivisionId)
+    @JoinColumn({ name: 'DivisionId' })
+    division: InterclubsDivisionEntity;
+    
+
+    /*
+    @OneToOne(type => InterclubsDivisionEntity, division => division.DivisionId) // specify inverse side as a second parameter
+    division: InterclubsDivisionEntity;
+    */
+
 }
