@@ -18,6 +18,7 @@ import { RoiModule } from './modules/roi/roi.module';
 import { InterclubsModule } from './modules/interclubs/interclubs.module';
 import { EntrainementModule } from './modules/entrainement/entrainement.module';
 import { PeriodeModule } from './modules/periode/periode.module';
+import { StageModule } from './modules/stage/stage.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PeriodeModule } from './modules/periode/periode.module';
     InterclubsModule,
     EntrainementModule,
     PeriodeModule,
+    StageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -98,6 +98,20 @@ export class EntrainementApiController
         }
         
         let classe: EntrainementClasseEntity = await this.entrainementService.updateClasse(createClasseDTO, connectedUser);
+
+        if(classe.imageFilename!==null && classe.imageFilename!==undefined && classe.imageFilename.length>0 
+            && classe.imageFilename!== createClasseDTO.imageFilename)
+        {
+            // Attention ! possible on n'a pas d'image associée lors de la mise à jour !
+            if(createClasseDTO.imageFilename===null || createClasseDTO.imageFilename===undefined || createClasseDTO.imageFilename.length===0)
+            {
+                // On supprime l'image
+            }
+            else
+            {
+                // on remplace l'image
+            }
+        }
         return classe;
     }
 

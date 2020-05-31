@@ -20,6 +20,7 @@ import { EntrainementApiController } from './entrainement-api/entrainement-api.c
 import { EntrainementModule } from '../../modules/entrainement/entrainement.module';
 import { PeriodeApiController } from './periode-api/periode-api.controller';
 import { PeriodeModule } from '../../modules/periode/periode.module';
+import { StageApiController } from './stage-api/stage-api.controller';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { PeriodeModule } from '../../modules/periode/periode.module';
     InterclubsApiController,
     EntrainementApiController,
     PeriodeApiController,
+    StageApiController,
   ],
   providers: [
   ],

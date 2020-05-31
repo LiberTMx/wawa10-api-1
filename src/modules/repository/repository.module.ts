@@ -26,6 +26,8 @@ import { EntrainementRepositoryService } from './entrainement/services/entrainem
 import { entrainementClasseProvider, entrainementClasseGroupeProvider, entrainementGroupeSeanceProvider } from './entrainement/entrainement.providers';
 import { PeriodeRepositoryService } from './periode/services/periode-repository/periode-repository.service';
 import { periodeProvider } from './periode/periode.providers';
+import { stageProvider } from './stage/stage.providers';
+import { StageRepositoryService } from './stage/services/stage-repository.service';
 
 @Module({
   imports: [
@@ -72,6 +74,8 @@ import { periodeProvider } from './periode/periode.providers';
     EntrainementRepositoryService, ...entrainementClasseProvider, ...entrainementClasseGroupeProvider, ...entrainementGroupeSeanceProvider,
     
     PeriodeRepositoryService, ...periodeProvider,
+
+    StageRepositoryService, ...stageProvider,
   ],
 })
 export class RepositoryModule {}
