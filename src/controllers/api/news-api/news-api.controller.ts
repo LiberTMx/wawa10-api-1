@@ -25,6 +25,7 @@ import { MessageModel } from '../../../shared/message.model';
 export class NewsApiController 
 {
     constructor(
+        private readonly authService: AuthService,
         private readonly configurationService: ConfigurationService,
         private readonly newsService: NewsService,
     ) {}
@@ -45,6 +46,13 @@ export class NewsApiController
     {
         logger.debug('files:', files);
         logger.debug('news create request body:', req.body);
+
+        const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+        const isUserClubAdmin=this.authService.verifyUserIsStageAdmin(connectedUser);
+        if (connectedUser === null || ! isUserClubAdmin) {
+            throw new BadRequestException('Unauthorized access');
+        }
+
         const news: NewsEntity = await this.newsService.create(createNewsDTO);
         let newsImage: NewsImageEntity=null;
         let newsDoc: NewsDocEntity=null;
@@ -53,6 +61,7 @@ export class NewsApiController
         {
 
             // ok la news existe bien, on peut ajouter l'image et/ou le pdf
+            // .files/news_dir/1/jupiler.jpg
             const newsBaseDir=this.configurationService.get('news_dir');
             const newsDir=newsBaseDir+'/'+news.id;
             logger.debug('news dir is:', newsDir);
