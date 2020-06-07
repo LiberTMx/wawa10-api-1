@@ -13,14 +13,14 @@ import { InterclubsSemaineVersionEntity } from '../../repository/interclubs/enti
 
 import * as log4js from 'log4js';
 import { plainToClass } from 'class-transformer';
-import { CreateSelectionDTO } from 'src/shared/dto/interclubs/create-selection.dto';
-import { InterclubsSelectionEntity } from 'src/modules/repository/interclubs/entities/interclubs-selection.entity';
-import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
-import { DeleteSelectionDTO } from 'src/shared/dto/interclubs/delete-selection.dto';
-import { PublishSelectionDTO } from 'src/shared/dto/interclubs/publish-selection.dto';
 import { LdfParticipantDTO } from '../../../shared/dto/interclubs/ldf-participant.dto';
 import { AuthService } from '../../auth/services/auth/auth.service';
 import { InterclubsEnrichedSelectionModel } from '../model/interclubs-enriched-selection.model';
+import { InterclubsSelectionEntity } from '../../repository/interclubs/entities/interclubs-selection.entity';
+import { CreateSelectionDTO } from '../../../shared/dto/interclubs/create-selection.dto';
+import { AuthUserEntity } from '../../repository/user/entities/auth-user.entity';
+import { DeleteSelectionDTO } from '../../../shared/dto/interclubs/delete-selection.dto';
+import { PublishSelectionDTO } from '../../../shared/dto/interclubs/publish-selection.dto';
 const logger = log4js.getLogger('InterclubsService');
 
 @Injectable()
@@ -190,7 +190,7 @@ export class InterclubsService
             {
                 const user = await this.authService.getUserById(sel.auth_user_id);
                 array.push(
-                    new InterclubsEnrichedSelectionModel(sel, user)
+                    new InterclubsEnrichedSelectionModel(sel, user),
                 );
             }
         }

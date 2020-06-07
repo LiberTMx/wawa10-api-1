@@ -7,7 +7,7 @@ export class InterclubsSelectionEntity
     id: number;
 
     @Column({name: 'interclubs_match_id'})
-    interclubs_match_id :  string;
+    interclubs_match_id : string;
 
     @Column({name: 'auth_user_id'})
     auth_user_id: number; 

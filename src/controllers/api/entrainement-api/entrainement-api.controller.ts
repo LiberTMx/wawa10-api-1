@@ -38,7 +38,7 @@ export class EntrainementApiController
         const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
         const isUserClubAdmin=this.authService.verifyUserIsStageAdmin(connectedUser);
         if (connectedUser === null || ! isUserClubAdmin) {
-        throw new BadRequestException('Unauthorized access');
+            throw new BadRequestException('Unauthorized access');
         }
         
         let classe: EntrainementClasseEntity = await this.entrainementService.createClasse(createClasseDTO, connectedUser);
@@ -78,6 +78,39 @@ export class EntrainementApiController
                 }
             }
 
+        }
+        return classe;
+    }
+
+    @Post('updateClasse')
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'avatar', maxCount: 1 },
+      ]))
+    async updateClasse(@Request() req, @UploadedFiles() files, @Body() createClasseDTO: CreateClasseDTO, @Headers() headers): Promise<EntrainementClasseEntity>
+    {
+        logger.debug('files:', files);
+        logger.debug('updateClasse request body:', req.body);
+
+        const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+        const isUserClubAdmin=this.authService.verifyUserIsStageAdmin(connectedUser);
+        if (connectedUser === null || ! isUserClubAdmin) {
+            throw new BadRequestException('Unauthorized access');
+        }
+        
+        let classe: EntrainementClasseEntity = await this.entrainementService.updateClasse(createClasseDTO, connectedUser);
+
+        if(classe.imageFilename!==null && classe.imageFilename!==undefined && classe.imageFilename.length>0 
+            && classe.imageFilename!== createClasseDTO.imageFilename)
+        {
+            // Attention ! possible on n'a pas d'image associée lors de la mise à jour !
+            if(createClasseDTO.imageFilename===null || createClasseDTO.imageFilename===undefined || createClasseDTO.imageFilename.length===0)
+            {
+                // On supprime l'image
+            }
+            else
+            {
+                // on remplace l'image
+            }
         }
         return classe;
     }

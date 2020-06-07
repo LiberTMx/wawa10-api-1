@@ -10,6 +10,8 @@ import 'reflect-metadata';
 import { initializeTransactionalContext } from 'typeorm-transactional-cls-hooked';
 import { AppModule } from './app.module';
 
+import * as fileSystem from 'fs';
+
 initializeTransactionalContext(); // Initialize cls-hooked
 
 /*
@@ -26,9 +28,21 @@ log4js.configure( cwd + '/config/log4js.json');
 //log4js.configure( './config/log4js.json');
 const logger = log4js.getLogger('app');
 
+const httpsOptions = {
+  key: fileSystem.readFileSync(cwd + '/config/ssl/localhost.key'),
+  cert: fileSystem.readFileSync( cwd + '/config/ssl/localhost.crt'),
+};
+
 async function bootstrap() {
-  const port = process.env.PORT || 3000;
-  const nestApp = await NestFactory.create(AppModule, {logger});
+  const useHttps=false;
+  const defaultPort = useHttps ? 443 : 3000;
+  const port = process.env.PORT || defaultPort;
+  let nestApp=null;
+  if(useHttps)
+  {nestApp = await NestFactory.create(AppModule, {logger, httpsOptions});}
+  else
+  {nestApp = await NestFactory.create(AppModule, {logger});}
+
   nestApp.setGlobalPrefix('api');
   nestApp.enableCors();
   nestApp.useGlobalPipes(
@@ -36,6 +50,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+
   const httpAdapter = nestApp.getHttpAdapter();
   httpAdapter.use(helmet())
     .use(compression())

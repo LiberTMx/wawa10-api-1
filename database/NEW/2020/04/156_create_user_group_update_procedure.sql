@@ -1,3 +1,5 @@
+delimiter $$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `set_user_default_group`()
 BEGIN
 	declare bDone int;
@@ -22,4 +24,6 @@ BEGIN
 			values( v_user_id, v_group_id);
 	END LOOP user_loop;
     close user_cursor;
-END
+END$$
+
+delimiter ;
