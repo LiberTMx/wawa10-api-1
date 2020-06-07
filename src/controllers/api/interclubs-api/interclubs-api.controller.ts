@@ -8,16 +8,16 @@ import { InterclubsService } from '../../../modules/interclubs/services/interclu
 import { InterclubsSemaineEntity } from '../../../modules/repository/interclubs/entities/interclubs-semaine.entity';
 import { InterclubsCategoryEntity } from '../../../modules/repository/interclubs/entities/interclubs-category.entity';
 import { InterclubsSemaineVersionEntity } from '../../../modules/repository/interclubs/entities/interclubs-semaine-version.entity';
-import { CreateSelectionDTO } from 'src/shared/dto/interclubs/create-selection.dto';
 import * as log4js from 'log4js';
-import { ResponseMessage } from 'src/shared/dto/response-message.dto';
-import { InterclubsSelectionEntity } from 'src/modules/repository/interclubs/entities/interclubs-selection.entity';
-import { AuthService } from 'src/modules/auth/services/auth/auth.service';
-import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
-import { DeleteSelectionDTO } from 'src/shared/dto/interclubs/delete-selection.dto';
-import { PublishSelectionDTO } from 'src/shared/dto/interclubs/publish-selection.dto';
 import { LdfParticipantDTO } from '../../../shared/dto/interclubs/ldf-participant.dto';
-import { InterclubsEnrichedSelectionModel } from 'src/modules/interclubs/model/interclubs-enriched-selection.model';
+import { InterclubsSelectionEntity } from '../../../modules/repository/interclubs/entities/interclubs-selection.entity';
+import { InterclubsEnrichedSelectionModel } from '../../../modules/interclubs/model/interclubs-enriched-selection.model';
+import { DeleteSelectionDTO } from '../../../shared/dto/interclubs/delete-selection.dto';
+import { ResponseMessage } from '../../../shared/dto/response-message.dto';
+import { PublishSelectionDTO } from '../../../shared/dto/interclubs/publish-selection.dto';
+import { AuthUserEntity } from '../../../modules/repository/user/entities/auth-user.entity';
+import { AuthService } from '../../../modules/auth/services/auth/auth.service';
+import { CreateSelectionDTO } from '../../../shared/dto/interclubs/create-selection.dto';
 const logger = log4js.getLogger('InterclubsApiController');
 
 @Controller('interclubs')

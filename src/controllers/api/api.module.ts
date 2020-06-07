@@ -21,6 +21,7 @@ import { EntrainementModule } from '../../modules/entrainement/entrainement.modu
 import { PeriodeApiController } from './periode-api/periode-api.controller';
 import { PeriodeModule } from '../../modules/periode/periode.module';
 import { StageApiController } from './stage-api/stage-api.controller';
+import { StageModule } from '../../modules/stage/stage.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { StageApiController } from './stage-api/stage-api.controller';
     InterclubsModule,
     EntrainementModule,
     PeriodeModule,
+    StageModule,
   ],
   controllers: [
     AuthApiController,

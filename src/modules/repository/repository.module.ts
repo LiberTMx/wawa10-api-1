@@ -49,6 +49,7 @@ import { StageRepositoryService } from './stage/services/stage-repository.servic
     InterclubsRepositoryService,
     EntrainementRepositoryService,
     PeriodeRepositoryService,
+    StageRepositoryService,
   ],
   providers: [
     CredentialRepositoryService, ...credentialProvider,

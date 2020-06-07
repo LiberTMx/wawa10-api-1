@@ -10,7 +10,6 @@ import { AfttMatchEntity } from '../../aftt/entities/aftt-match.entity';
 import { InterclubsLdfParticipantEntity } from '../entities/interclubs-ldf-participant.entity';
 import { InterclubsLdfByCategoryEntity } from '../entities/interclubs-ldf-by-category.entity';
 import { InterclubsSemaineVersionEntity } from '../entities/interclubs-semaine-version.entity';
-import { CreateSelectionDTO } from 'src/shared/dto/interclubs/create-selection.dto';
 import { InterclubsSelectionEntity } from '../entities/interclubs-selection.entity';
 
 @Injectable()
