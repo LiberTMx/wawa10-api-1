@@ -1,4 +1,4 @@
-import { Controller, Post, Request, UploadedFiles, UseInterceptors, Body, Get, Res, BadRequestException, Query } from '@nestjs/common';
+import { Controller, Post, Request, UploadedFiles, UseInterceptors, Body, Get, Res, BadRequestException, Query, Headers } from '@nestjs/common';
 import { NewsService } from '../../../modules/news/services/news/news.service';
 
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -20,6 +20,8 @@ import { Response } from 'express';
 import { UpdateNewsStatusDTO } from '../../../shared/dto/news/update-news-status.dto';
 import { validateSync } from 'class-validator';
 import { MessageModel } from '../../../shared/message.model';
+import { AuthService } from 'src/modules/auth/services/auth/auth.service';
+import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
 
 @Controller('news')
 export class NewsApiController 
@@ -42,7 +44,7 @@ export class NewsApiController
         { name: 'avatar', maxCount: 1 },
         { name: 'avatarPdf', maxCount: 1 },
       ]))
-    async createNews(@Request() req, @UploadedFiles() files, @Body() createNewsDTO: CreateNewsDTO): Promise<CreateNewsResponseDTO>
+    async createNews(@Request() req, @UploadedFiles() files, @Body() createNewsDTO: CreateNewsDTO, @Headers() headers): Promise<CreateNewsResponseDTO>
     {
         logger.debug('files:', files);
         logger.debug('news create request body:', req.body);
