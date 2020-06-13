@@ -20,8 +20,8 @@ import { Response } from 'express';
 import { UpdateNewsStatusDTO } from '../../../shared/dto/news/update-news-status.dto';
 import { validateSync } from 'class-validator';
 import { MessageModel } from '../../../shared/message.model';
-import { AuthService } from 'src/modules/auth/services/auth/auth.service';
-import { AuthUserEntity } from 'src/modules/repository/user/entities/auth-user.entity';
+import { AuthService } from '../../../modules/auth/services/auth/auth.service';
+import { AuthUserEntity } from '../../../modules/repository/user/entities/auth-user.entity';
 
 @Controller('news')
 export class NewsApiController 

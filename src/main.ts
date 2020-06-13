@@ -28,20 +28,23 @@ log4js.configure( cwd + '/config/log4js.json');
 //log4js.configure( './config/log4js.json');
 const logger = log4js.getLogger('app');
 
-const httpsOptions = {
-  key: fileSystem.readFileSync(cwd + '/config/ssl/localhost.key'),
-  cert: fileSystem.readFileSync( cwd + '/config/ssl/localhost.crt'),
-};
-
 async function bootstrap() {
   const useHttps=false;
   const defaultPort = useHttps ? 443 : 3000;
   const port = process.env.PORT || defaultPort;
   let nestApp=null;
   if(useHttps)
-  {nestApp = await NestFactory.create(AppModule, {logger, httpsOptions});}
+  {
+    const httpsOptions = {
+      key: fileSystem.readFileSync(cwd + '/config/ssl/localhost.key'),
+      cert: fileSystem.readFileSync( cwd + '/config/ssl/localhost.crt'),
+    };
+    {nestApp = await NestFactory.create(AppModule, {logger, httpsOptions});}
+  }
   else
-  {nestApp = await NestFactory.create(AppModule, {logger});}
+  {
+    {nestApp = await NestFactory.create(AppModule, {logger});}
+  }
 
   nestApp.setGlobalPrefix('api');
   nestApp.enableCors();
@@ -50,7 +53,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
 
   const httpAdapter = nestApp.getHttpAdapter();
   httpAdapter.use(helmet())

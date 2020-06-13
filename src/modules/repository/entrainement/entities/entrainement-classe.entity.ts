@@ -25,7 +25,7 @@ export class EntrainementClasseEntity
     @Column({name: 'image_filename'})
     imageFilename: string;
 
-    @Column({name: 'statut'})
+    @Column({name: 'statut', type: 'enum', enum: ClasseStatusType})
     status: ClasseStatusType;
 
     @Column({name: 'external_link'})

@@ -25,6 +25,7 @@ export class EntrainementRepositoryService
 
     async saveClasse(classe: EntrainementClasseEntity): Promise<EntrainementClasseEntity> 
     {
+        logger.debug('saveClasse', classe);
         return this.classeRepository.save(classe);
     }
 
