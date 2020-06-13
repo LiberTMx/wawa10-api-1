@@ -21,6 +21,7 @@ import { CreateSelectionDTO } from '../../../shared/dto/interclubs/create-select
 import { AuthUserEntity } from '../../repository/user/entities/auth-user.entity';
 import { DeleteSelectionDTO } from '../../../shared/dto/interclubs/delete-selection.dto';
 import { PublishSelectionDTO } from '../../../shared/dto/interclubs/publish-selection.dto';
+import { ValidateSelectionDTO } from 'src/shared/dto/interclubs/validate-selection.dto';
 const logger = log4js.getLogger('InterclubsService');
 
 @Injectable()
@@ -235,5 +236,16 @@ export class InterclubsService
             logger.debug('update entity - participant not found by id', participant);   
         }
         return e;
+    }
+
+    async validateSelection(validateSelectionDTO: ValidateSelectionDTO, connectedUser): Promise<InterclubsSelectionEntity>
+    {
+
+        
+        const selectionActuelle = await this.interclubsRepositoryService.findSelectionById(validateSelectionDTO.selectionId);
+        
+        selectionActuelle.joueur_confirmation = validateSelectionDTO.statut;
+        selectionActuelle.joueur_commentaire = validateSelectionDTO.commentaire;
+        return this.interclubsRepositoryService.storeSelection(selectionActuelle);
     }
 }

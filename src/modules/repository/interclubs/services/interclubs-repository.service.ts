@@ -278,4 +278,10 @@ export class InterclubsRepositoryService
         this.interclubsSelectionProvider.remove(existingSelection);
     }
 
+    async findSelectionById(selectionId: number): Promise<InterclubsSelectionEntity>
+    {
+        return this.interclubsSelectionProvider.createQueryBuilder('sel')
+        .where('sel.id = :pSelId', { pSelId: selectionId})
+        .getOne();
+    }
 }

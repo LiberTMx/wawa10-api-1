@@ -18,6 +18,7 @@ import { PublishSelectionDTO } from '../../../shared/dto/interclubs/publish-sele
 import { AuthUserEntity } from '../../../modules/repository/user/entities/auth-user.entity';
 import { AuthService } from '../../../modules/auth/services/auth/auth.service';
 import { CreateSelectionDTO } from '../../../shared/dto/interclubs/create-selection.dto';
+import { ValidateSelectionDTO } from '../../../shared/dto/interclubs/validate-selection.dto';
 const logger = log4js.getLogger('InterclubsApiController');
 
 @Controller('interclubs')
@@ -28,7 +29,7 @@ export class InterclubsApiController {
         private readonly interclubsService: InterclubsService,
         ) {}
         
-    // http://server/api/interclubs/listeSemainesInterclubs/dames
+    // http://localhost:3000/api/interclubs/listeSemainesInterclubs/dames
     @Get('listeInterclubsSemaines/:type')
     async getInterclubsSemaineByInterclubType(@Request() req): Promise< InterclubsSemaineEntity[] >
     {
@@ -36,12 +37,14 @@ export class InterclubsApiController {
         return this.interclubsService.getInterclubsSemaineByInterclubType(interclubType);
     }
 
+    // http://localhost:3000/api/interclubs/listeInterclubsCategories
     @Get('listeInterclubsCategories')
     async getInterclubsCategories(@Request() req): Promise< InterclubsCategoryEntity[] >
     {
         return this.interclubsService.getInterclubsCategories();
     }
 
+    // http://localhost:3000/api/interclubs/listeInterclubsDivisions
     @Get('listeInterclubsDivisions')
     async getInterclubsDivisions(@Request() req): Promise< InterclubsDivisionEntity[] >
     {
@@ -191,4 +194,30 @@ export class InterclubsApiController {
         return await this.interclubsService.updateLdfParticipant(participant, connectedUser);
 
     }
+
+    // validateSelection
+    @Post('validateSelection')
+    async validateSelection(@Request() req, @Body() validateSelectionDTO: ValidateSelectionDTO, @Headers() headers): Promise< any >
+    {
+        /*
+            selectionId: String(selection.sel.id),
+            statut: formValue.statut,
+            commentaire: formValue.comentaire
+        */
+        const connectedUser: AuthUserEntity = await this.authService.identifyUser(headers.authorization);
+        const isUserClubAdmin=this.authService.verifyUserIsClubAdmain(connectedUser);
+        if (connectedUser === null || ! isUserClubAdmin) {
+            throw new BadRequestException('Unauthorized access');
+        }
+
+        logger.debug('validateSelection', validateSelectionDTO);
+
+/*         participant=JSON.parse(participant.participant);
+        if(participant===null || participant===undefined) return null; */
+
+        return await this.interclubsService.validateSelection(validateSelectionDTO, connectedUser);
+        //return 'ok';
+
+    }
+
 }
